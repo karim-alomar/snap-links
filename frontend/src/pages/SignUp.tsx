@@ -28,21 +28,8 @@ const SignUp = () => {
 
   const onSubmit: SubmitHandler<ISignUpSchema> = async (value) => {
     console.log(value);
-
-    // const res = (await registerMutation(value)) as APIActionResponse<any>;
-    // const { error, success } = res.data.messages;
-    // if (error) {
-    //   return setValidMessage({ error });
-    // }
-    // toast({
-    //   title: success,
-    //   variant: "success",
-    // });
-    // setOpenOtpModal(true);
-    // setCredential({
-    //   email: value.email,
-    //   password: value.password,
-    // });
+    // TODO: For Testing
+    setValidMessage({ success: "success" });
   };
   return (
     <AuthCardWrapper

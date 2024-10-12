@@ -28,33 +28,8 @@ const SignIn = () => {
   const onSubmit: SubmitHandler<ISignInSchema> = async (value) => {
     console.log(value);
 
-    // const res = (await loginMutation(value)) as APIActionResponse<any>;
-    // const { extra_response, messages } = res.data;
-    // if (messages.error) {
-    //   return setValidMessage({ error: messages.error });
-    // }
-    // if (!!extra_response) {
-    //   setOpenOtpModal(true);
-    //   setCredential({
-    //     email: value.email,
-    //     password: value.password,
-    //   });
-    //   toast({
-    //     title: messages.success,
-    //     variant: "success",
-    //   });
-    //   return;
-    // }
-    // await signIn("credentials", {
-    //   email: value.email,
-    //   password: value.password,
-    //   callbackUrl: callbackUrl ?? DEFAULT_ROUTE,
-    // });
-    // toast({
-    //   title: messages.success,
-    //   description: t("auth.alerts.redirect_after_login"),
-    //   variant: "success",
-    // });
+    // TODO: For Testing
+    setValidMessage({ success: "success" });
   };
   return (
     <AuthCardWrapper
