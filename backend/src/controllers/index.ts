@@ -1,2 +1,2 @@
-export * from "./auth";
-export * from "./shorten-link";
+export * from "./authController";
+export * from "./linkController";
