@@ -25,3 +25,6 @@ frontend/*.sln
 frontend/*.sw?
 
 # ⚠️ Backend ⚠️
+backend/.env
+backend/node_modules
+backend/package-lock.json
