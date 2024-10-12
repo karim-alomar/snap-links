@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export const Navbar = () => {
   return (
-    <div className="flex items-center justify-between py-3">
+    <div className="flex items-center justify-between py-3 border-b">
       <Link to="/">
         <h3 className="font-bold text-2xl">Snap Links</h3>
       </Link>
