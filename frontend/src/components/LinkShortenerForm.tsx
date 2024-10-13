@@ -4,11 +4,20 @@ import {
   CardHeader,
   CardTitle,
   Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   InputControl,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SubmitButton,
 } from "@/components";
-import { useAppDispatch } from "@/hooks";
-import { useToast } from "@/hooks/use-toast";
+import { useAppDispatch, useAppSelector, useToast } from "@/hooks";
 import { ILinkShortenerSchema, LinkShortenerSchema } from "@/shcemas";
 import {
   updateLinksQueryData,
@@ -17,6 +26,7 @@ import {
 } from "@/store/slices/api/linkSlice";
 import { APIActionResponse, LinkType } from "@/types";
 import { yupResolver } from "@hookform/resolvers/yup";
+import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import { Link } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -26,6 +36,7 @@ interface Props {
   linkEditState?: { link?: LinkType; mode: "update" | "create" };
 }
 export const LinkShortenerForm = ({ linkEditState }: Props) => {
+  const { user } = useAppSelector(({ user }) => user);
   const [shortLink, setShortLink] = useState<string>("");
   const dispatch = useAppDispatch();
   const { toast } = useToast();
@@ -36,10 +47,15 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
     return linkEditState?.mode === "update";
   }, [linkEditState?.mode]);
 
+  const getDiffDays = useMemo(() => {
+    return dayjs(linkEditState?.link?.expiresAt).diff(dayjs(), "day");
+  }, [linkEditState?.link?.expiresAt]);
+
   const form = useForm<ILinkShortenerSchema>({
     resolver: yupResolver(LinkShortenerSchema),
     defaultValues: {
       url: "",
+      expiry_time: null,
     },
   });
 
@@ -48,8 +64,9 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
   useEffect(() => {
     form.reset({
       url: linkEditState?.link?.longUrl,
+      expiry_time: 10,
     });
-  }, [form, linkEditState?.link?.longUrl]);
+  }, [form, getDiffDays, linkEditState?.link?.longUrl]);
 
   const onSubmit: SubmitHandler<ILinkShortenerSchema> = async (value) => {
     const mutation = isUpdateble ? updateLinkMutation : createLinkMutation;
@@ -105,23 +122,50 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex items-center space-x-2"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <div className="w-full">
               <InputControl
                 control={form.control}
+                inputLabel="URL to shorten"
                 inputName="url"
                 inputPlaceholder="Enter a long URL"
                 type="url"
               />
             </div>
+            {user && (
+              <FormField
+                control={form.control}
+                name="expiry_time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link expiry time</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      // defaultValue={String(field.value)}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a verified email to display" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Array.from({ length: 10 }).map((_, i) => (
+                          <SelectItem key={i} value={String(i + 1)}>
+                            <span>{`${i + 1} Day`}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <SubmitButton
               title="Shorten"
               isDisabled={!isValid || !isDirty || isSubmitting}
               isLoading={isSubmitting}
-              className="w-fit h-11"
+              className="w-full"
             />
           </form>
         </Form>
