@@ -5,7 +5,7 @@ import { Details } from "express-useragent";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
 import { getLinkById } from "../actions/getLinkById";
-import { daysToSeconds, getDeviceType, randomUUID, shortenUrl } from "../utils";
+import { daysToSeconds, getDeviceType, randomUUID } from "../utils";
 
 export const fetchLinks = async (req: Request, res: Response) => {
   try {
@@ -81,16 +81,21 @@ export const createLink = async (req: Request, res: Response) => {
         new Date().getTime() + daysToSeconds(Number(expiry_time + 1)) * 1000
       );
     }
+
     const linkData = {
       shortUrl,
       longUrl: url,
     };
+
     if (user) {
       link = await db.link.create({
         data: {
           ...linkData,
           userId: user?.id,
           expiresAt: expiryTime,
+        },
+        include: {
+          linkAnalytics: true,
         },
       });
     } else {
@@ -99,6 +104,9 @@ export const createLink = async (req: Request, res: Response) => {
         data: {
           ...linkData,
           guestId: newGuestId,
+        },
+        include: {
+          linkAnalytics: true,
         },
       });
     }
@@ -117,7 +125,8 @@ export const createLink = async (req: Request, res: Response) => {
 export const updateLink = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { url } = req.body;
+    const { url, expiry_time } = req.body;
+    let expiryTime;
 
     if (!url) {
       res.status(400).json({
@@ -126,8 +135,14 @@ export const updateLink = async (req: Request, res: Response) => {
       return;
     }
 
-    const { shortUrl } = await shortenUrl(url);
-    // const shortUrl = "foo2";
+    // const { shortUrl } = await shortenUrl(url);
+    const shortUrl = "foo2";
+
+    if (expiry_time) {
+      expiryTime = new Date(
+        new Date().getTime() + daysToSeconds(Number(expiry_time + 1)) * 1000
+      );
+    }
 
     const link = await db.link.update({
       where: {
@@ -136,6 +151,10 @@ export const updateLink = async (req: Request, res: Response) => {
       data: {
         shortUrl,
         longUrl: url,
+        expiresAt: expiryTime,
+      },
+      include: {
+        linkAnalytics: true,
       },
     });
 
