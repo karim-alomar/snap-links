@@ -10,6 +10,7 @@ import {
   FormLabel,
   FormMessage,
   InputControl,
+  LinkComponent,
   Select,
   SelectContent,
   SelectItem,
@@ -28,7 +29,6 @@ import { APIActionResponse, LinkType } from "@/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
-import { Link } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -37,7 +37,7 @@ interface Props {
 }
 export const LinkShortenerForm = ({ linkEditState }: Props) => {
   const { user } = useAppSelector(({ user }) => user);
-  const [shortLink, setShortLink] = useState<string>("");
+  const [link, setLink] = useState<LinkType>();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [createLinkMutation] = useCreateLinkMutation();
@@ -84,7 +84,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
       });
     }
 
-    setShortLink(data.shortUrl);
+    setLink(data);
     Cookies.set("guest_id", data.guestId);
     if (isUpdateble) {
       dispatch(
@@ -169,15 +169,10 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
             />
           </form>
         </Form>
-        {shortLink && (
-          <a
-            href={`https://${shortLink}`}
-            target="_blank"
-            className="p-2 bg-slate-100 rounded-md mt-3 text-blue-500 flex items-center justify-start gap-1 hover:underline"
-          >
-            <Link size={15} />
-            {shortLink}
-          </a>
+        {link && (
+          <div className="p-3 bg-blue-50 rounded-md mt-3">
+            <LinkComponent link={link} />
+          </div>
         )}
       </CardContent>
     </Card>

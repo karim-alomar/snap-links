@@ -4,6 +4,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  LinkComponent,
   LinkDetailsModal,
   Table,
   TableBody,
@@ -15,18 +16,12 @@ import {
 import { useAppDispatch, useAppSelector, useToast } from "@/hooks";
 import {
   updateLinksQueryData,
-  useClickLinkMutation,
   useDeleteLinkMutation,
   useFetchLinksQuery,
 } from "@/store/slices/api/linkSlice";
-import {
-  APIActionResponse,
-  LinkAnalytics,
-  LinkType,
-  MessagesType,
-} from "@/types";
+import { APIActionResponse, LinkType, MessagesType } from "@/types";
 import dayjs from "dayjs";
-import { BarChart, Edit, Eye, Link, Loader2, Trash } from "lucide-react";
+import { BarChart, Edit, Eye, Loader2, Trash } from "lucide-react";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import QRCode from "react-qr-code";
 
@@ -44,7 +39,6 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
   const dispatch = useAppDispatch();
   const { data: links } = useFetchLinksQuery();
   const [deleteLinkMutation, { isLoading }] = useDeleteLinkMutation();
-  const [clickLinkMutation] = useClickLinkMutation();
 
   const getDiffDays = useMemo(
     () => (expiresAt?: Date) => {
@@ -52,30 +46,6 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
     },
     []
   );
-
-  const handleClickLinkAction = async (id: number) => {
-    const res = (await clickLinkMutation({
-      id,
-    })) as unknown as APIActionResponse<LinkAnalytics>;
-
-    const { messages, data } = res.data;
-
-    if (messages.error) {
-      return toast({
-        title: "There is an error in the server.",
-        variant: "destructive",
-      });
-    }
-
-    dispatch(
-      updateLinksQueryData("fetchLinks", undefined, (draft) => {
-        const itemIndex = draft.data.findIndex((item) => item.id === id);
-        if (itemIndex !== -1) {
-          draft.data[itemIndex]?.linkAnalytics?.push(data);
-        }
-      })
-    );
-  };
 
   const handleDelete = async (id: number) => {
     const res = (await deleteLinkMutation({
@@ -127,16 +97,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
               {links?.data.map((link) => (
                 <TableRow key={link.id}>
                   <TableCell>
-                    <a
-                      href={`https://${link.shortUrl}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-blue-600 hover:underline"
-                      onClick={() => handleClickLinkAction(link.id)}
-                    >
-                      <Link className="w-4 h-4 mr-1" />
-                      {link.shortUrl}
-                    </a>
+                    <LinkComponent link={link} />
                   </TableCell>
                   <TableCell className="max-w-xs truncate">
                     {link.longUrl}
