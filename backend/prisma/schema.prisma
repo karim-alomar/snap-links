@@ -13,18 +13,33 @@ model User {
   email       String?  @unique
   password    String?
   accessToken String?  @unique @db.Text
-  Links       Links[]
+  Links       Link[]
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
 }
 
-model Links {
+model Link {
+  id            Int             @id @default(autoincrement())
+  userId        Int?
+  guestId       String?
+  shortUrl      String
+  longUrl       String
+  user          User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkAnalytics LinkAnalytics[]
+  updatedAt     DateTime        @updatedAt
+  createdAt     DateTime        @default(now())
+}
+
+model LinkAnalytics {
   id        Int      @id @default(autoincrement())
-  userId    Int?
-  guestId   String?
-  shortUrl  String
-  longUrl   String
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkId    Int?
+  country   String?
+  timezone  String?
+  city      String?
+  region    String?
+  browser   String?
+  device    String?
+  link      Link?    @relation(fields: [linkId], references: [id], onDelete: Cascade)
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }
