@@ -15,5 +15,12 @@ export const useAuth = () => {
     navigate("/");
     window.location.reload();
   };
-  return { login };
+
+  const logout = () => {
+    Cookies.remove("access_token");
+    Cookies.remove("guest_id");
+    navigate("/", { replace: true });
+    window.location.reload();
+  };
+  return { login, logout };
 };
