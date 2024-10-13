@@ -8,6 +8,7 @@ export interface LinkType {
   longUrl: string;
   user: User;
   linkAnalytics: LinkAnalytics[];
+  expiresAt?: Date;
   updatedAt: Date;
   createdAt: Date;
 }
