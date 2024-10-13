@@ -8,6 +8,7 @@ import {
   SubmitButton,
 } from "@/components";
 import { useAppDispatch } from "@/hooks";
+import { useToast } from "@/hooks/use-toast";
 import { ILinkShortenerSchema, LinkShortenerSchema } from "@/shcemas";
 import {
   updateLinksQueryData,
@@ -27,6 +28,7 @@ interface Props {
 export const LinkShortenerForm = ({ linkEditState }: Props) => {
   const [shortLink, setShortLink] = useState<string>("");
   const dispatch = useAppDispatch();
+  const { toast } = useToast();
   const [createLinkMutation] = useCreateLinkMutation();
   const [updateLinkMutation] = useUpdateLinkMutation();
 
@@ -56,7 +58,14 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
       ...(isUpdateble && { id: linkEditState?.link?.id }),
     })) as unknown as APIActionResponse<LinkType>;
 
-    const { data } = res.data;
+    const { data, messages } = res.data;
+
+    if (messages.error) {
+      toast({
+        title: "There is an error in the server.",
+        variant: "destructive",
+      });
+    }
 
     setShortLink(data.shortUrl);
     Cookies.set("guest_id", data.guestId);
@@ -71,6 +80,11 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
           }
         })
       );
+
+      toast({
+        title: "Link updated successfully",
+        variant: "success",
+      });
       return;
     }
     dispatch(
@@ -78,6 +92,10 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
         draft.data.unshift(data);
       })
     );
+    toast({
+      title: "Link created successfully",
+      variant: "success",
+    });
   };
 
   return (
