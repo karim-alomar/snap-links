@@ -4,7 +4,7 @@ import geoip from "geoip-lite";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
 import { getLinkById } from "../actions/getLinkById";
-import { getDeviceType, randomUUID, shortenUrl } from "../utils";
+import { daysToSeconds, getDeviceType, randomUUID, shortenUrl } from "../utils";
 
 export const fetchLinks = async (req: Request, res: Response) => {
   try {
@@ -58,10 +58,11 @@ export const fetchLinks = async (req: Request, res: Response) => {
 
 export const createLink = async (req: Request, res: Response) => {
   try {
-    const { url } = req.body;
+    const { url, expiry_time } = req.body;
     const guestId = req.headers["guest_id"] as string;
     const token = req.headers["access_token"] as string;
     let link;
+    let expiryTime;
 
     if (!url) {
       res.status(400).json({
@@ -74,6 +75,11 @@ export const createLink = async (req: Request, res: Response) => {
     const shortUrl = "foo";
     const user = await getUserByToken(token as string);
 
+    if (expiry_time) {
+      expiryTime = new Date(
+        new Date().getTime() + daysToSeconds(Number(expiry_time + 1)) * 1000
+      );
+    }
     const linkData = {
       shortUrl,
       longUrl: url,
@@ -83,6 +89,7 @@ export const createLink = async (req: Request, res: Response) => {
         data: {
           ...linkData,
           userId: user?.id,
+          expiresAt: expiryTime,
         },
       });
     } else {
