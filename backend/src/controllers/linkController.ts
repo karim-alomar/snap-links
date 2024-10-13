@@ -9,6 +9,7 @@ import {
   getDeviceType,
   getUserLocationData,
   randomUUID,
+  shortenUrl,
 } from "../utils";
 
 export const fetchLinks = async (req: Request, res: Response) => {
@@ -76,8 +77,7 @@ export const createLink = async (req: Request, res: Response) => {
       return;
     }
 
-    // const { shortUrl } = await shortenUrl(url);
-    const shortUrl = "foo";
+    const { shortUrl } = await shortenUrl(url);
     const user = await getUserByToken(token as string);
 
     if (expiry_time) {
@@ -139,8 +139,7 @@ export const updateLink = async (req: Request, res: Response) => {
       return;
     }
 
-    // const { shortUrl } = await shortenUrl(url);
-    const shortUrl = "foo2";
+    const { shortUrl } = await shortenUrl(url);
 
     if (expiry_time) {
       expiryTime = new Date(
