@@ -219,7 +219,10 @@ export const clickLink = async (req: Request, res: Response) => {
       return;
     }
 
-    const locationData = await getUserLocationData(req.ip ?? "0.0.0.0");
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const locationData = await getUserLocationData((ip as string) ?? "0.0.0.0");
+
+    console.log(ip);
 
     const linkAnalytics = await db.linkAnalytics.create({
       data: {
