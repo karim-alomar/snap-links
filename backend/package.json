@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "npx nodemon",
-    "vercel-build": "echo hello",
+    "start": "nodemon ./src/index.ts",
     "build": "tsc",
+    "vercel-build": "echo hello",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
