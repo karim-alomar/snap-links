@@ -7,11 +7,33 @@ import {
   InputControl,
   SubmitButton,
 } from "@/components";
+import { useAppDispatch } from "@/hooks";
 import { ILinkShortenerSchema, LinkShortenerSchema } from "@/shcemas";
+import {
+  updateLinksQueryData,
+  useCreateLinkMutation,
+  useUpdateLinkMutation,
+} from "@/store/slices/api/linkSlice";
+import { APIActionResponse, LinkType } from "@/types";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Cookies from "js-cookie";
+import { Link } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-export const LinkShortenerForm = () => {
+interface Props {
+  linkEditState: { link?: LinkType; mode: "update" | "create" };
+}
+export const LinkShortenerForm = ({ linkEditState }: Props) => {
+  const [shortLink, setShortLink] = useState<string>("");
+  const dispatch = useAppDispatch();
+  const [createLinkMutation] = useCreateLinkMutation();
+  const [updateLinkMutation] = useUpdateLinkMutation();
+
+  const isUpdateble = useMemo(() => {
+    return linkEditState.mode === "update";
+  }, [linkEditState.mode]);
+
   const form = useForm<ILinkShortenerSchema>({
     resolver: yupResolver(LinkShortenerSchema),
     defaultValues: {
@@ -21,9 +43,43 @@ export const LinkShortenerForm = () => {
 
   const { isValid, isDirty, isSubmitting } = form.formState;
 
+  useEffect(() => {
+    form.reset({
+      url: linkEditState?.link?.longUrl,
+    });
+  }, [form, linkEditState.link?.longUrl]);
+
   const onSubmit: SubmitHandler<ILinkShortenerSchema> = async (value) => {
-    console.log(value);
+    const mutation = isUpdateble ? updateLinkMutation : createLinkMutation;
+    const res = (await mutation({
+      ...value,
+      ...(isUpdateble && { id: linkEditState.link?.id }),
+    })) as unknown as APIActionResponse<LinkType>;
+
+    const { data } = res.data;
+
+    setShortLink(data.shortUrl);
+    Cookies.set("guest_id", data.guestId);
+    if (isUpdateble) {
+      dispatch(
+        updateLinksQueryData("fetchLinks", undefined, (draft) => {
+          const itemIndex = draft.data.findIndex(
+            (item) => item.id === linkEditState.link?.id
+          );
+          if (itemIndex !== -1) {
+            draft.data[itemIndex] = data;
+          }
+        })
+      );
+      return;
+    }
+    dispatch(
+      updateLinksQueryData("fetchLinks", undefined, (draft) => {
+        draft.data.unshift(data);
+      })
+    );
   };
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -51,6 +107,16 @@ export const LinkShortenerForm = () => {
             />
           </form>
         </Form>
+        {shortLink && (
+          <a
+            href={shortLink}
+            target="_blank"
+            className="p-2 bg-slate-100 rounded-md mt-3 text-blue-500 flex items-center justify-start gap-1 hover:underline"
+          >
+            <Link size={15} />
+            {shortLink}
+          </a>
+        )}
       </CardContent>
     </Card>
   );
