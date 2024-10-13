@@ -29,21 +29,27 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
         <DialogHeader>
           <DialogTitle>Link Details</DialogTitle>
         </DialogHeader>
-        {link?.linkAnalytics?.map((item) => (
-          <div key={item.id} className="border shadow-md p-3">
-            <div className="grid grid-cols-3 gap-3">
-              {displayKeys.map(({ label, key }) => (
-                <div
-                  key={key}
-                  className="flex flex-col items-start justify-start"
-                >
-                  <span className="text-black/50">{label}:</span>
-                  <span>{item[key]}</span>
-                </div>
-              ))}
+        {link?.linkAnalytics?.length === 0 ? (
+          <span className="text-center py-10 text-black/50">
+            <span className="text-2xl">⚠️</span> There are no details
+          </span>
+        ) : (
+          link?.linkAnalytics?.map((item) => (
+            <div key={item.id} className="border shadow-md p-3">
+              <div className="grid grid-cols-3 gap-3">
+                {displayKeys.map(({ label, key }) => (
+                  <div
+                    key={key}
+                    className="flex flex-col items-start justify-start"
+                  >
+                    <span className="text-black/50">{label}:</span>
+                    <span>{item[key]}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </DialogContent>
     </Dialog>
   );
