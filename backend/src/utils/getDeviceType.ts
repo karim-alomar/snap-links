@@ -1,4 +1,4 @@
-import { DeviceType } from "deviceType";
+import { DeviceType } from "../types";
 
 export const getDeviceType = (ua: DeviceType) => {
   switch (true) {

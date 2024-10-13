@@ -1,5 +1,6 @@
 import { Link } from "@prisma/client";
 import { Request, Response } from "express";
+import { Details } from "express-useragent";
 import geoip from "geoip-lite";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
@@ -182,10 +183,10 @@ export const deleteLink = async (req: Request, res: Response) => {
 export const clickLink = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userAgent = req.useragent;
+    const userAgent = req.useragent as Details;
     const deviceType = getDeviceType(userAgent);
 
-    const coordinates = geoip.lookup("88.238.194.140");
+    const coordinates = geoip.lookup("24.226.125.232");
     const link = await getLinkById(Number(id));
 
     if (!link) {
@@ -200,11 +201,11 @@ export const clickLink = async (req: Request, res: Response) => {
     const linkAnalytics = await db.linkAnalytics.create({
       data: {
         linkId: Number(id),
-        country: coordinates.country,
-        timezone: coordinates.timezone,
-        city: coordinates.city,
-        region: coordinates.region,
-        browser: userAgent.browser,
+        country: coordinates?.country,
+        timezone: coordinates?.timezone,
+        city: coordinates?.city,
+        region: coordinates?.region,
+        browser: userAgent?.browser,
         device: deviceType,
       },
     });
