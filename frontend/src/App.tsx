@@ -1,9 +1,6 @@
 import { LinkShortenerForm, ShortenedLinkTable } from "@/components";
 import { LinkType } from "@/types";
-import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
-import { useAppDispatch } from "./hooks";
-import { fetchAuth } from "./store/slices/user-slice";
+import { useState } from "react";
 
 const App = () => {
   const [linkEditState, setLinkEditState] = useState<{
@@ -13,14 +10,6 @@ const App = () => {
     link: undefined,
     mode: "create",
   });
-  const dispatch = useAppDispatch();
-  const token = Cookies.get("access_token");
-
-  useEffect(() => {
-    if (token) {
-      dispatch(fetchAuth());
-    }
-  }, [dispatch, token]);
 
   return (
     <div className="mt-10">
