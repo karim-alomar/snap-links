@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/hooks";
+import { useToast } from "@/hooks";
 import {
   updateLinksQueryData,
   useClickLinkMutation,
@@ -25,8 +26,9 @@ import {
   LinkType,
   MessagesType,
 } from "@/types";
+import dayjs from "dayjs";
 import { BarChart, Edit, Eye, Link, Loader2, Trash } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import QRCode from "react-qr-code";
 
 interface Props {
@@ -39,6 +41,7 @@ interface Props {
 }
 export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
   const { user } = useAppSelector(({ user }) => user);
+  const { toast } = useToast();
   const dispatch = useAppDispatch();
   const { data: links } = useFetchLinksQuery();
   const [deleteLinkMutation, { isLoading }] = useDeleteLinkMutation();
@@ -62,6 +65,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
       })
     );
   };
+
   const handleDelete = async (id: number) => {
     const res = (await deleteLinkMutation({
       id,
@@ -75,8 +79,17 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
         draft.data = draft.data.filter((link) => link.id !== id);
       })
     );
+    toast({
+      title: `#${id} Link deleted successfully`,
+      variant: "success",
+    });
   };
-
+  const getDiffDays = useMemo(
+    () => (expiresAt?: Date) => {
+      return dayjs(expiresAt).diff(dayjs(), "day");
+    },
+    []
+  );
   return (
     (links?.data.length as number) > 0 && (
       <Card>
@@ -91,7 +104,12 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                 <TableHead>Original Link</TableHead>
                 <TableHead>Clicks</TableHead>
                 <TableHead>QR code</TableHead>
-                {user && <TableHead>Actions</TableHead>}
+                {user && (
+                  <>
+                    <TableHead>Expiry time</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -121,6 +139,15 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                   <TableCell>
                     <QRCode value={link.shortUrl} size={80} />
                   </TableCell>
+                  {user && (
+                    <TableCell>
+                      <span>
+                        {getDiffDays(link?.expiresAt)
+                          ? `${getDiffDays(link?.expiresAt)} Days`
+                          : "N/A"}
+                      </span>
+                    </TableCell>
+                  )}
                   <TableCell className="flex items-center justify-start gap-2 h-24">
                     <LinkDetailsModal link={link}>
                       <Button variant="outline" size="icon">
