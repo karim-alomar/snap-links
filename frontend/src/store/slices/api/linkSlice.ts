@@ -10,7 +10,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-    createLink: builder.mutation<APIActionResponse<LinkType>, { url: string }>({
+    createLink: builder.mutation<
+      APIActionResponse<LinkType>,
+      { url: string; expiry_time?: number | null }
+    >({
       query: (data) => ({
         url: "/links",
         method: "POST",
@@ -19,7 +22,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
     }),
     updateLink: builder.mutation<
       APIActionResponse<LinkType>,
-      { id?: number; url: string }
+      { id?: number; url: string; expiry_time?: number | null }
     >({
       query: ({ id, ...data }) => ({
         url: `/links/${id}`,
