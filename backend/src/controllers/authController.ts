@@ -4,6 +4,7 @@ import { getUserByEmail, getUserByToken } from "../actions/auth";
 import { db } from "../../db";
 import * as jwt from "jsonwebtoken";
 import { JWT_SECRET_KEY } from "../secret";
+import { User } from "@prisma/client";
 
 export const auth = async (req: Request, res: Response) => {
   const token = req.headers["access_token"] as string;
@@ -32,7 +33,7 @@ export const register = async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
     const guestId = req.headers["guest_id"] as string;
 
-    let user = await getUserByEmail(email);
+    let user: User | any = await getUserByEmail(email);
 
     if (user) {
       res.json({
