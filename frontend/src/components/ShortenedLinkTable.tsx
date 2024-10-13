@@ -30,7 +30,7 @@ import { Dispatch, SetStateAction } from "react";
 import QRCode from "react-qr-code";
 
 interface Props {
-  setLinkEditState: Dispatch<
+  setLinkEditState?: Dispatch<
     SetStateAction<{
       link?: LinkType;
       mode: "update" | "create";
@@ -131,7 +131,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                       <>
                         <Button
                           onClick={() =>
-                            setLinkEditState({
+                            setLinkEditState?.({
                               link,
                               mode: "update",
                             })

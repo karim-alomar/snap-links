@@ -22,7 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface Props {
-  linkEditState: { link?: LinkType; mode: "update" | "create" };
+  linkEditState?: { link?: LinkType; mode: "update" | "create" };
 }
 export const LinkShortenerForm = ({ linkEditState }: Props) => {
   const [shortLink, setShortLink] = useState<string>("");
@@ -31,8 +31,8 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
   const [updateLinkMutation] = useUpdateLinkMutation();
 
   const isUpdateble = useMemo(() => {
-    return linkEditState.mode === "update";
-  }, [linkEditState.mode]);
+    return linkEditState?.mode === "update";
+  }, [linkEditState?.mode]);
 
   const form = useForm<ILinkShortenerSchema>({
     resolver: yupResolver(LinkShortenerSchema),
@@ -47,13 +47,13 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
     form.reset({
       url: linkEditState?.link?.longUrl,
     });
-  }, [form, linkEditState.link?.longUrl]);
+  }, [form, linkEditState?.link?.longUrl]);
 
   const onSubmit: SubmitHandler<ILinkShortenerSchema> = async (value) => {
     const mutation = isUpdateble ? updateLinkMutation : createLinkMutation;
     const res = (await mutation({
       ...value,
-      ...(isUpdateble && { id: linkEditState.link?.id }),
+      ...(isUpdateble && { id: linkEditState?.link?.id }),
     })) as unknown as APIActionResponse<LinkType>;
 
     const { data } = res.data;
@@ -64,7 +64,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
       dispatch(
         updateLinksQueryData("fetchLinks", undefined, (draft) => {
           const itemIndex = draft.data.findIndex(
-            (item) => item.id === linkEditState.link?.id
+            (item) => item.id === linkEditState?.link?.id
           );
           if (itemIndex !== -1) {
             draft.data[itemIndex] = data;
