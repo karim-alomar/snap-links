@@ -44,8 +44,6 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
     });
   }, [link?.linkAnalytics]);
 
-  console.log(mapData);
-
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
