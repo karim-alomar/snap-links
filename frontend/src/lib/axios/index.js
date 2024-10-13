@@ -1,7 +1,7 @@
 import Axios from "axios";
 import Cookies from "js-cookie";
 export const axios = Axios.create({
-  baseURL: `http://localhost:3000/api`,
+  baseURL: `https://snaplinksbe.vercel.app/api`,
   withCredentials: false,
   headers: {
     Accept: "application/json",
