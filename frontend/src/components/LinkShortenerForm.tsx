@@ -78,7 +78,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
     const { data, messages } = res.data;
 
     if (messages.error) {
-      toast({
+      return toast({
         title: "There is an error in the server.",
         variant: "destructive",
       });

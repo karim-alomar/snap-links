@@ -38,11 +38,14 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
     return link?.linkAnalytics?.map((item) => {
       const country = item.country;
       return {
-        country: country as string,
+        country: country ?? "tr",
         value: countryClickCounts[country as string] || 0,
       };
     });
   }, [link?.linkAnalytics]);
+
+  console.log(mapData);
+
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>

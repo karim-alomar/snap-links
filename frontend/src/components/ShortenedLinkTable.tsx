@@ -12,8 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components";
-import { useAppDispatch, useAppSelector } from "@/hooks";
-import { useToast } from "@/hooks";
+import { useAppDispatch, useAppSelector, useToast } from "@/hooks";
 import {
   updateLinksQueryData,
   useClickLinkMutation,
@@ -47,14 +46,26 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
   const [deleteLinkMutation, { isLoading }] = useDeleteLinkMutation();
   const [clickLinkMutation] = useClickLinkMutation();
 
-  const handleClickLink = async (id: number) => {
+  const getDiffDays = useMemo(
+    () => (expiresAt?: Date) => {
+      return dayjs(expiresAt).diff(dayjs(), "day");
+    },
+    []
+  );
+
+  const handleClickLinkAction = async (id: number) => {
     const res = (await clickLinkMutation({
       id,
     })) as unknown as APIActionResponse<LinkAnalytics>;
 
     const { messages, data } = res.data;
 
-    if (messages.error) return;
+    if (messages.error) {
+      return toast({
+        title: "There is an error in the server.",
+        variant: "destructive",
+      });
+    }
 
     dispatch(
       updateLinksQueryData("fetchLinks", undefined, (draft) => {
@@ -72,7 +83,12 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
     })) as unknown as APIActionResponse<MessagesType>;
     const { error } = res.data.messages;
 
-    if (error) return;
+    if (error) {
+      return toast({
+        title: "There is an error in the server.",
+        variant: "destructive",
+      });
+    }
 
     dispatch(
       updateLinksQueryData("fetchLinks", undefined, (draft) => {
@@ -84,12 +100,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
       variant: "success",
     });
   };
-  const getDiffDays = useMemo(
-    () => (expiresAt?: Date) => {
-      return dayjs(expiresAt).diff(dayjs(), "day");
-    },
-    []
-  );
+
   return (
     (links?.data.length as number) > 0 && (
       <Card>
@@ -121,7 +132,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center text-blue-600 hover:underline"
-                      onClick={() => handleClickLink(link.id)}
+                      onClick={() => handleClickLinkAction(link.id)}
                     >
                       <Link className="w-4 h-4 mr-1" />
                       {link.shortUrl}
