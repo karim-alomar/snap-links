@@ -1,10 +1,13 @@
 import express, { Express } from "express";
-import { PORT } from "./secret";
-import { PrismaClient } from "@prisma/client";
+import cors from "cors";
+import useragent from "express-useragent";
 import rootRouter from "./routes";
+import { PORT } from "./secret";
 
 const app: Express = express();
 
+app.use(cors());
+app.use(useragent.express());
 app.use(express.json());
 
 // ⚠️ Add To Test On The Server ⚠️
