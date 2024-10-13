@@ -18,3 +18,5 @@ app.get("/", (req, res) => {
 app.use("/api", rootRouter);
 
 app.listen(PORT, () => console.log("App is working!"));
+
+export default app;
