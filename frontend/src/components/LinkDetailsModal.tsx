@@ -6,7 +6,8 @@ import {
   DialogTrigger,
 } from "@/components";
 import { LinkAnalytics, LinkType } from "@/types";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
+import WorldMap from "react-svg-worldmap";
 
 interface Props {
   children: ReactNode;
@@ -22,6 +23,26 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
     { label: "Browser", key: "browser" },
   ];
 
+  const mapData = useMemo(() => {
+    const countryClickCounts = link?.linkAnalytics?.reduce<
+      Record<string, number>
+    >((accumulator, analyticsItem) => {
+      const countryName = analyticsItem.country;
+
+      if (countryName) {
+        accumulator[countryName] = (accumulator[countryName] || 0) + 1;
+      }
+      return accumulator;
+    }, {});
+
+    return link?.linkAnalytics?.map((item) => {
+      const country = item.country;
+      return {
+        country: country as string,
+        value: countryClickCounts[country as string] || 0,
+      };
+    });
+  }, [link?.linkAnalytics]);
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -34,21 +55,29 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
             <span className="text-2xl">⚠️</span> There are no details
           </span>
         ) : (
-          link?.linkAnalytics?.map((item) => (
-            <div key={item.id} className="border shadow-md p-3">
-              <div className="grid grid-cols-3 gap-3">
-                {displayKeys.map(({ label, key }) => (
-                  <div
-                    key={key}
-                    className="flex flex-col items-start justify-start"
-                  >
-                    <span className="text-black/50">{label}:</span>
-                    <span>{item[key]}</span>
-                  </div>
-                ))}
+          <>
+            <WorldMap
+              color="#f97316"
+              value-suffix="people"
+              size="responsive"
+              data={mapData ?? []}
+            />
+            {link?.linkAnalytics?.map((item) => (
+              <div key={item.id} className="border shadow-md p-3">
+                <div className="grid grid-cols-3 gap-3">
+                  {displayKeys.map(({ label, key }) => (
+                    <div
+                      key={key}
+                      className="flex flex-col items-start justify-start"
+                    >
+                      <span className="text-black/50">{label}:</span>
+                      <span>{item[key]}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </>
         )}
       </DialogContent>
     </Dialog>
