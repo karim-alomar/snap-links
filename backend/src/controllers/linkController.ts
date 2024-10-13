@@ -77,7 +77,7 @@ export const createLink = async (req: Request, res: Response) => {
       return;
     }
 
-    const { shortUrl } = await shortenUrl(url);
+    const shortUrl = await shortenUrl(url);
     const user = await getUserByToken(token as string);
 
     if (expiry_time) {
@@ -131,6 +131,7 @@ export const updateLink = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { url, expiry_time } = req.body;
     let expiryTime;
+    let shortUrl;
 
     if (!url) {
       res.status(400).json({
@@ -139,7 +140,11 @@ export const updateLink = async (req: Request, res: Response) => {
       return;
     }
 
-    const { shortUrl } = await shortenUrl(url);
+    const currentLink = await getLinkById(Number(id));
+
+    if (url !== currentLink?.longUrl) {
+      shortUrl = await shortenUrl(url);
+    }
 
     if (expiry_time) {
       expiryTime = new Date(

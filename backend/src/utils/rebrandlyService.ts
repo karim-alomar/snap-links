@@ -17,7 +17,5 @@ export const shortenUrl = async (url: string) => {
 
   const { shortUrl } = rebrandlyResponse.data;
 
-  return {
-    shortUrl,
-  };
+  return shortUrl;
 };
