@@ -1,8 +1,60 @@
+import { Link } from "@prisma/client";
 import { Request, Response } from "express";
+import geoip from "geoip-lite";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
-import { randomUUID } from "../utils/uuid";
 import { getLinkById } from "../actions/getLinkById";
+import { getDeviceType, randomUUID, shortenUrl } from "../utils";
+
+export const fetchLinks = async (req: Request, res: Response) => {
+  try {
+    const guestId = req.headers["guest_id"] as string;
+    const token = req.headers["access_token"] as string;
+    let links: Link[] = [];
+
+    const user = await getUserByToken(token as string);
+
+    if (user) {
+      links = await db.link.findMany({
+        where: {
+          userId: user.id,
+        },
+        orderBy: [
+          {
+            createdAt: "desc",
+          },
+        ],
+        include: {
+          linkAnalytics: true,
+        },
+      });
+    } else {
+      if (guestId) {
+        links = await db.link.findMany({
+          where: {
+            guestId,
+          },
+          orderBy: [
+            {
+              createdAt: "desc",
+            },
+          ],
+          include: {
+            linkAnalytics: true,
+          },
+        });
+      }
+    }
+
+    res.json({
+      data: links,
+    });
+  } catch (error: any) {
+    res.json({
+      messages: { error: error.message },
+    });
+  }
+};
 
 export const createLink = async (req: Request, res: Response) => {
   try {
@@ -15,6 +67,7 @@ export const createLink = async (req: Request, res: Response) => {
       res.status(400).json({
         messages: { error: "URL is required" },
       });
+      return;
     }
 
     // const { shortUrl } = await shortenUrl(url);
@@ -26,7 +79,7 @@ export const createLink = async (req: Request, res: Response) => {
       longUrl: url,
     };
     if (user) {
-      link = await db.links.create({
+      link = await db.link.create({
         data: {
           ...linkData,
           userId: user?.id,
@@ -34,7 +87,7 @@ export const createLink = async (req: Request, res: Response) => {
       });
     } else {
       const newGuestId = guestId || randomUUID();
-      link = await db.links.create({
+      link = await db.link.create({
         data: {
           ...linkData,
           guestId: newGuestId,
@@ -62,12 +115,13 @@ export const updateLink = async (req: Request, res: Response) => {
       res.status(400).json({
         messages: { error: "URL is required" },
       });
+      return;
     }
 
-    // const { shortUrl } = await shortenUrl(url);
-    const shortUrl = "foo2";
+    const { shortUrl } = await shortenUrl(url);
+    // const shortUrl = "foo2";
 
-    const link = await db.links.update({
+    const link = await db.link.update({
       where: {
         id: Number(id),
       },
@@ -94,14 +148,15 @@ export const deleteLink = async (req: Request, res: Response) => {
     const link = await getLinkById(Number(id));
 
     if (!link) {
-      res.status(400).json({
+      res.json({
         messages: {
           success: "The link you are trying to delete does not exist!",
         },
       });
+      return;
     }
 
-    await db.links.delete({
+    await db.link.delete({
       where: {
         id: Number(id),
       },
@@ -109,6 +164,47 @@ export const deleteLink = async (req: Request, res: Response) => {
 
     res.json({
       messages: { success: "Link deleted successfully" },
+    });
+  } catch (error: any) {
+    res.json({
+      messages: { error: error.message },
+    });
+  }
+};
+
+export const clickLink = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userAgent = req.useragent;
+    const deviceType = getDeviceType(userAgent);
+
+    const coordinates = geoip.lookup("88.238.194.140");
+    const link = await getLinkById(Number(id));
+
+    if (!link) {
+      res.json({
+        messages: {
+          success: "The link you are trying to update does not exist!",
+        },
+      });
+      return;
+    }
+
+    const linkAnalytics = await db.linkAnalytics.create({
+      data: {
+        linkId: Number(id),
+        country: coordinates.country,
+        timezone: coordinates.timezone,
+        city: coordinates.city,
+        region: coordinates.region,
+        browser: userAgent.browser,
+        device: deviceType,
+      },
+    });
+
+    res.json({
+      data: linkAnalytics,
+      messages: { success: "Success" },
     });
   } catch (error: any) {
     res.json({
