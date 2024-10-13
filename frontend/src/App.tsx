@@ -1,25 +1,33 @@
-import { Home, SignIn, SignUp } from "@/pages";
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-  RouterProvider,
-} from "react-router-dom";
-import { AuthLayout, RootLayout } from "@/layout";
+import { LinkShortenerForm, ShortenedLinkTable } from "@/components";
+import { LinkType } from "@/types";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "./hooks";
+import { fetchAuth } from "./store/slices/user-slice";
 
 const App = () => {
-  const router = createBrowserRouter(
-    createRoutesFromElements(
-      <Route path="/" element={<RootLayout />}>
-        <Route index element={<Home />} />
-        <Route path="/auth" element={<AuthLayout />}>
-          <Route path="sign-in" element={<SignIn />} />
-          <Route path="sign-up" element={<SignUp />} />
-        </Route>
-      </Route>
-    )
+  const [linkEditState, setLinkEditState] = useState<{
+    link?: LinkType;
+    mode: "update" | "create";
+  }>({
+    link: undefined,
+    mode: "create",
+  });
+  const dispatch = useAppDispatch();
+  const token = Cookies.get("access_token");
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAuth());
+    }
+  }, [dispatch, token]);
+
+  return (
+    <div className="mt-10">
+      <LinkShortenerForm linkEditState={linkEditState} />
+      <ShortenedLinkTable setLinkEditState={setLinkEditState} />
+    </div>
   );
-  return <RouterProvider router={router} />;
 };
 
 export default App;
