@@ -29,7 +29,7 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
         <DialogHeader>
           <DialogTitle>Link Details</DialogTitle>
         </DialogHeader>
-        {link.linkAnalytics.map((item) => (
+        {link?.linkAnalytics?.map((item) => (
           <div key={item.id} className="border shadow-md p-3">
             <div className="grid grid-cols-3 gap-3">
               {displayKeys.map(({ label, key }) => (
