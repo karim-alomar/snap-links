@@ -64,7 +64,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
   useEffect(() => {
     form.reset({
       url: linkEditState?.link?.longUrl,
-      expiry_time: 10,
+      expiry_time: getDiffDays,
     });
   }, [form, getDiffDays, linkEditState?.link?.longUrl]);
 
@@ -171,7 +171,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
         </Form>
         {shortLink && (
           <a
-            href={shortLink}
+            href={`https://${shortLink}`}
             target="_blank"
             className="p-2 bg-slate-100 rounded-md mt-3 text-blue-500 flex items-center justify-start gap-1 hover:underline"
           >
