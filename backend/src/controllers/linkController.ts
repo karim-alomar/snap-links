@@ -1,11 +1,15 @@
 import { Link } from "@prisma/client";
 import { Request, Response } from "express";
 import { Details } from "express-useragent";
-// import geoip from "geoip-lite";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
 import { getLinkById } from "../actions/getLinkById";
-import { daysToSeconds, getDeviceType, randomUUID } from "../utils";
+import {
+  daysToSeconds,
+  getDeviceType,
+  getUserLocationData,
+  randomUUID,
+} from "../utils";
 
 export const fetchLinks = async (req: Request, res: Response) => {
   try {
@@ -204,8 +208,6 @@ export const clickLink = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userAgent = req.useragent as Details;
     const deviceType = getDeviceType(userAgent);
-
-    // const coordinates = geoip.lookup("24.226.125.232");
     const link = await getLinkById(Number(id));
 
     if (!link) {
@@ -217,13 +219,15 @@ export const clickLink = async (req: Request, res: Response) => {
       return;
     }
 
+    const locationData = await getUserLocationData(req.ip ?? "0.0.0.0");
+
     const linkAnalytics = await db.linkAnalytics.create({
       data: {
         linkId: Number(id),
-        // country: coordinates?.country,
-        // timezone: coordinates?.timezone,
-        // city: coordinates?.city,
-        // region: coordinates?.region,
+        country: locationData?.country_code,
+        // timezone: locationData?.country.timezone.code,
+        city: locationData?.city,
+        region: locationData?.region_name,
         browser: userAgent?.browser,
         device: deviceType,
       },
