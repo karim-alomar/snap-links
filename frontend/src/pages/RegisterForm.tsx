@@ -5,19 +5,24 @@ import {
   SubmitButton,
   ValidationMessage,
 } from "@/components";
-import { ISignUpSchema, SignUpSchema } from "@/shcemas";
+import { useAuth } from "@/hooks";
+import { IRegisterFormSchema, RegisterFormSchema } from "@/shcemas";
+import { useRegisterMutation } from "@/store/slices/api/authSlice";
+import { APIActionResponse, User } from "@/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-const SignUp = () => {
+const RegisterForm = () => {
   const [validMessage, setValidMessage] = useState<{
     success?: string | null;
     error?: string | null;
   }>();
+  const { login } = useAuth();
+  const [registerMutation] = useRegisterMutation();
 
-  const form = useForm<ISignUpSchema>({
-    resolver: yupResolver(SignUpSchema),
+  const form = useForm<IRegisterFormSchema>({
+    resolver: yupResolver(RegisterFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -26,16 +31,21 @@ const SignUp = () => {
   });
   const { isValid, isDirty, isSubmitting } = form.formState;
 
-  const onSubmit: SubmitHandler<ISignUpSchema> = async (value) => {
-    console.log(value);
-    // TODO: For Testing
-    setValidMessage({ success: "success" });
+  const onSubmit: SubmitHandler<IRegisterFormSchema> = async (value) => {
+    const res = (await registerMutation(
+      value
+    )) as unknown as APIActionResponse<User>;
+    const { messages, data } = res.data;
+
+    if (messages.error) return setValidMessage({ error: messages.error });
+
+    login(data);
   };
   return (
     <AuthCardWrapper
       title="Sign Up"
       description="Create an account to start shortening links"
-      backButtonHref="sign-in"
+      backButtonHref="login"
       backButtonLabel="Already have an account? Sign in"
     >
       <Form {...form}>
@@ -91,4 +101,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default RegisterForm;

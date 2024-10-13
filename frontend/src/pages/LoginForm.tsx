@@ -3,39 +3,50 @@ import {
   Form,
   InputControl,
   SubmitButton,
+  ValidationMessage,
 } from "@/components";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useAuth } from "@/hooks";
+import { ILoginFormSchema, LoginFormSchema } from "@/shcemas";
+import { useLoginMutation } from "@/store/slices/api/authSlice";
+import { APIActionResponse, User } from "@/types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { SignInSchema, ISignInSchema } from "@/shcemas";
 import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
-const SignIn = () => {
+const LoginForm = () => {
   const [validMessage, setValidMessage] = useState<{
     success?: string | null;
     error?: string | null;
   }>();
+  const { login } = useAuth();
+  const [loginMutation] = useLoginMutation();
 
-  const form = useForm<ISignInSchema>({
-    resolver: yupResolver(SignInSchema),
+  const form = useForm<ILoginFormSchema>({
+    resolver: yupResolver(LoginFormSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "alomark@gmail.com",
+      password: "OMKa2310",
     },
   });
 
   const { isValid, isDirty, isSubmitting } = form.formState;
 
-  const onSubmit: SubmitHandler<ISignInSchema> = async (value) => {
-    console.log(value);
+  const onSubmit: SubmitHandler<ILoginFormSchema> = async (value) => {
+    const res = (await loginMutation(
+      value
+    )) as unknown as APIActionResponse<User>;
 
-    // TODO: For Testing
-    setValidMessage({ success: "success" });
+    const { messages, data } = res.data;
+
+    if (messages.error) return setValidMessage({ error: messages.error });
+
+    login(data);
   };
   return (
     <AuthCardWrapper
       title="Sign In"
       description="Enter your credentials to access your account"
-      backButtonHref="sign-up"
+      backButtonHref="register"
       backButtonLabel="Don't have an account? Sign up"
     >
       <Form {...form}>
@@ -63,12 +74,18 @@ const SignIn = () => {
               />
             </div>
           </div>
+          {validMessage && validMessage.error && (
+            <ValidationMessage
+              validationMessage={{
+                error: validMessage.error,
+              }}
+            />
+          )}
           <SubmitButton
             title="Sign in"
             isDisabled={!isValid || !isDirty || isSubmitting}
             isLoading={isSubmitting}
             isSendProtected={!!validMessage?.success}
-            // && ((validMessage.success?.length > 0) as boolean)
           />
         </form>
       </Form>
@@ -76,4 +93,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default LoginForm;
