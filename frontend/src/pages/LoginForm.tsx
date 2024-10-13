@@ -24,8 +24,8 @@ const LoginForm = () => {
   const form = useForm<ILoginFormSchema>({
     resolver: yupResolver(LoginFormSchema),
     defaultValues: {
-      email: "alomark@gmail.com",
-      password: "OMKa2310",
+      email: "",
+      password: "",
     },
   });
 
