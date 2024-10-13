@@ -1,3 +1,3 @@
-export * from "./sign-in-schema";
-export * from "./sign-up-schema";
+export * from "./login-form-schema";
+export * from "./register-form-schema";
 export * from "./link-shortener-schema";

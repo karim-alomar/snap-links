@@ -1,12 +1,8 @@
 import { MIN_PASSWORD } from "@/global";
 import * as yup from "yup";
 
-export const SignUpSchema = yup.object({
-  name: yup
-    .string()
-    .min(2, "Name field is required")
-    .required("Name field is required"),
-  email: yup.string().email().required("Invalid email"),
+export const LoginFormSchema = yup.object({
+  email: yup.string().email().required("auth.email_is_invalid"),
   password: yup
     .string()
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
@@ -18,4 +14,4 @@ export const SignUpSchema = yup.object({
     .required(),
 });
 
-export type ISignUpSchema = yup.InferType<typeof SignUpSchema>;
+export type ILoginFormSchema = yup.InferType<typeof LoginFormSchema>;
