@@ -60,7 +60,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
       updateLinksQueryData("fetchLinks", undefined, (draft) => {
         const itemIndex = draft.data.findIndex((item) => item.id === id);
         if (itemIndex !== -1) {
-          draft.data[itemIndex].linkAnalytics.push(data);
+          draft.data[itemIndex]?.linkAnalytics?.push(data);
         }
       })
     );
@@ -117,7 +117,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                 <TableRow key={link.id}>
                   <TableCell>
                     <a
-                      href={link.shortUrl}
+                      href={`https://${link.shortUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center text-blue-600 hover:underline"
