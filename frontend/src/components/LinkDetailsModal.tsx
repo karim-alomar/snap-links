@@ -57,27 +57,34 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
           </span>
         ) : (
           <>
-            <WorldMap
-              color="#f97316"
-              value-suffix="people"
-              size="responsive"
-              data={mapData ?? []}
-            />
-            {link?.linkAnalytics?.map((item) => (
-              <div key={item.id} className="border shadow-md p-3">
-                <div className="grid grid-cols-3 gap-3">
-                  {displayKeys.map(({ label, key }) => (
-                    <div
-                      key={key}
-                      className="flex flex-col items-start justify-start"
-                    >
-                      <span className="text-black/50">{label}:</span>
-                      <span>{item[key]}</span>
-                    </div>
-                  ))}
+            <div className="flex items-center justify-center">
+              <WorldMap
+                color="#f97316"
+                value-suffix="people"
+                size="lg"
+                data={mapData ?? []}
+              />
+            </div>
+            <div className="h-32 overflow-scroll">
+              {link?.linkAnalytics?.map((item) => (
+                <div
+                  key={item.id}
+                  className="border shadow-md p-3 md:mb-0 mb-3"
+                >
+                  <div className="grid md:grid-cols-3 gap-3">
+                    {displayKeys.map(({ label, key }) => (
+                      <div
+                        key={key}
+                        className="flex md:flex-col items-start justify-start md:gap-0 gap-2"
+                      >
+                        <span className="text-black/50">{label}:</span>
+                        <span>{item[key]}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </>
         )}
       </DialogContent>
