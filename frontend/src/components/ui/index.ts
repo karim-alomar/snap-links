@@ -5,3 +5,4 @@ export * from "./input";
 export * from "./form";
 export * from "./alert";
 export * from "./table";
+export * from "./dialog";
