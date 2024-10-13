@@ -1,9 +1,31 @@
 import { Request, Response } from "express";
 import { hashSync, compareSync } from "bcrypt";
-import { getUserByEmail } from "../actions/auth";
+import { getUserByEmail, getUserByToken } from "../actions/auth";
 import { db } from "../../db";
 import * as jwt from "jsonwebtoken";
 import { JWT_SECRET_KEY } from "../secret";
+
+export const auth = async (req: Request, res: Response) => {
+  const token = req.headers["access_token"] as string;
+
+  const user = await getUserByToken(token);
+
+  if (!user) {
+    res.status(400).json({
+      messages: {
+        error: "User not found",
+      },
+    });
+    return;
+  }
+
+  res.json({
+    data: user,
+    messages: {
+      success: "Success",
+    },
+  });
+};
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -16,6 +38,7 @@ export const register = async (req: Request, res: Response) => {
       res.json({
         messages: { error: "User already exists" },
       });
+      return;
     }
 
     const hashPassword = hashSync(password, 10);
@@ -35,7 +58,7 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (guestId) {
-      await db.links.updateMany({
+      await db.link.updateMany({
         where: { guestId },
         data: { userId: user.id, guestId: null },
       });
@@ -60,6 +83,7 @@ export const login = async (req: Request, res: Response) => {
       res.json({
         messages: { error: "Email and password are required" },
       });
+      return;
     }
 
     let user = await getUserByEmail(email);
@@ -68,6 +92,7 @@ export const login = async (req: Request, res: Response) => {
       res.json({
         messages: { error: "Invalid credentials" },
       });
+      return;
     }
 
     const isPasswordValid = compareSync(password, user?.password as string);
@@ -76,6 +101,7 @@ export const login = async (req: Request, res: Response) => {
       res.json({
         messages: { error: "Password not correct!" },
       });
+      return;
     }
 
     const token = jwt.sign(
@@ -95,7 +121,7 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if (guestId) {
-      await db.links.updateMany({
+      await db.link.updateMany({
         where: { guestId },
         data: { userId: user.id, guestId: null },
       });
