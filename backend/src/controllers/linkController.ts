@@ -96,7 +96,7 @@ export const createLink = async (req: Request, res: Response) => {
     if (user) {
       if (expiry_time) {
         expiryTime = new Date(
-          new Date().getTime() + daysToSeconds(Number(expiry_time + 1)) * 1000
+          new Date().getTime() + daysToSeconds(Number(expiry_time)) * 1000
         );
       }
 
@@ -149,7 +149,7 @@ export const updateLink = async (req: Request, res: Response) => {
 
     if (expiry_time) {
       expiryTime = new Date(
-        new Date().getTime() + daysToSeconds(Number(expiry_time + 1)) * 1000
+        new Date().getTime() + daysToSeconds(Number(expiry_time)) * 1000
       );
     }
 
