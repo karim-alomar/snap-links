@@ -93,7 +93,10 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
             (item) => item.id === linkEditState?.link?.id
           );
           if (itemIndex !== -1) {
-            draft.data[itemIndex] = data;
+            draft.data[itemIndex] = {
+              ...data,
+              status: "Active",
+            };
           }
         })
       );
