@@ -4,7 +4,7 @@ import { Details } from "express-useragent";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
 import { getLinkById, getLinkByLinkId } from "../actions/linkHandlers";
-import { DOMAIN_NAME } from "../secret";
+import { BASE_URL } from "../secret";
 import {
   daysToSeconds,
   generateShortLink,
@@ -82,7 +82,7 @@ export const createLink = async (req: Request, res: Response) => {
     const user = await getUserByToken(token as string);
 
     const linkData = {
-      shortUrl: `${DOMAIN_NAME}/${uniqLinkId}`,
+      shortUrl: `${BASE_URL}/${uniqLinkId}`,
       longUrl: url,
       linkId: uniqLinkId,
     };
