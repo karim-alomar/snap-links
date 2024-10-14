@@ -1,7 +1,8 @@
-import express, { Express } from "express";
 import cors from "cors";
+import express, { Express } from "express";
 import useragent from "express-useragent";
 import rootRouter from "./routes";
+import appRouter from "./routes/appRouter";
 import { PORT } from "./secret";
 
 const app: Express = express();
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", rootRouter);
+app.use("/", appRouter);
 
 app.listen(PORT, () => console.log("App is working!"));
 
