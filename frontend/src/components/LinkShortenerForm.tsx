@@ -106,7 +106,10 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
     }
     dispatch(
       updateLinksQueryData("fetchLinks", undefined, (draft) => {
-        draft.data.unshift(data);
+        draft.data.unshift({
+          ...data,
+          status: "Active",
+        });
       })
     );
     toast({
