@@ -208,12 +208,10 @@ export const linkTracking = async (req: Request, res: Response) => {
     const deviceType = getDeviceType(userAgent);
     const link = await getLinkByLinkId(linkId);
 
-    if (!link) {
-      res.json({
-        messages: {
-          error: "The link you are trying to update does not exist!",
-        },
-      });
+    const linkIsExpired = new Date(link?.expiresAt as Date) < new Date();
+
+    if (!link || linkIsExpired) {
+      res.send("The link you want to access does not exist.");
       return;
     }
 
