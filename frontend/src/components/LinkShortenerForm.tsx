@@ -82,7 +82,9 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
     }
 
     setLink(data);
-    Cookies.set("guest_id", data.guestId);
+    if (!user) {
+      Cookies.set("guest_id", data.guestId);
+    }
     if (isUpdateble) {
       dispatch(
         updateLinksQueryData("fetchLinks", undefined, (draft) => {
