@@ -138,7 +138,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
                 name="expiry_time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Link expiry time</FormLabel>
+                    <FormLabel>Link expiry time after:</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={String(field.value)}
