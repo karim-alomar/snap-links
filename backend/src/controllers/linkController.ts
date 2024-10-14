@@ -201,7 +201,7 @@ export const deleteLink = async (req: Request, res: Response) => {
   }
 };
 
-export const clickLink = async (req: Request, res: Response) => {
+export const trackingLink = async (req: Request, res: Response) => {
   try {
     const { code } = req.params;
     const userAgent = req.useragent as Details;

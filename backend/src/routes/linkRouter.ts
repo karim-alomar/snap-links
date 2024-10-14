@@ -4,7 +4,7 @@ import {
   updateLink,
   deleteLink,
   fetchLinks,
-  clickLink,
+  trackingLink,
 } from "../controllers";
 
 const linkRouter: Router = Router();
@@ -13,6 +13,6 @@ linkRouter.get("/links", fetchLinks);
 linkRouter.post("/links", createLink);
 linkRouter.put("/links/:id", updateLink);
 linkRouter.delete("/links/:id", deleteLink);
-linkRouter.get("/:code", clickLink);
+linkRouter.get("/:code", trackingLink);
 
 export default linkRouter;
