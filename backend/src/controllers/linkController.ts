@@ -133,20 +133,12 @@ export const updateLink = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { url, expiry_time } = req.body;
     let expiryTime;
-    let shortUrl;
 
     if (!url) {
       res.status(400).json({
         messages: { error: "URL is required" },
       });
       return;
-    }
-
-    const currentLink = await getLinkById(Number(id));
-
-    if (url !== currentLink?.longUrl) {
-      const uniqCode = generateShortLink();
-      shortUrl = `${ENDPOINT}/${uniqCode}`;
     }
 
     if (expiry_time) {
@@ -160,7 +152,6 @@ export const updateLink = async (req: Request, res: Response) => {
         id: Number(id),
       },
       data: {
-        shortUrl,
         longUrl: url,
         expiresAt: expiryTime,
       },
