@@ -216,7 +216,7 @@ export const linkTracking = async (req: Request, res: Response) => {
 
     const linkIsExpired = new Date(link?.expiresAt as Date) < new Date();
 
-    if (!link || linkIsExpired) {
+    if (!link || (!!link?.expiresAt && linkIsExpired)) {
       res.send("The link you want to access does not exist.");
       return;
     }
