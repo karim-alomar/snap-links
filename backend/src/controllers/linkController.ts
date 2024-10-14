@@ -77,7 +77,8 @@ export const createLink = async (req: Request, res: Response) => {
       return;
     }
 
-    const shortUrl = await shortenUrl(url);
+    // const shortUrl = await shortenUrl(url);
+    const shortUrl = "rebrand.ly/vpz4xmq";
     const user = await getUserByToken(token as string);
 
     if (expiry_time) {
@@ -86,8 +87,10 @@ export const createLink = async (req: Request, res: Response) => {
       );
     }
 
+    console.log(shortUrl.split("/")[1]);
+
     const linkData = {
-      shortUrl,
+      shortUrl: `https://snaplinks.vercel.app/${shortUrl.split("/")[1]}`,
       longUrl: url,
     };
 
@@ -237,11 +240,12 @@ export const clickLink = async (req: Request, res: Response) => {
         device: deviceType,
       },
     });
-
-    res.json({
-      data: linkAnalytics,
-      messages: { success: "Success" },
-    });
+    const shortUrl = "rebrand.ly/vpz4xmq";
+    res.redirect(shortUrl);
+    // res.json({
+    //   data: linkAnalytics,
+    //   messages: { success: "Success" },
+    // });
   } catch (error: any) {
     res.json({
       messages: { error: error.message },
