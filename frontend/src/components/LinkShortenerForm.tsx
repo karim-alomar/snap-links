@@ -35,6 +35,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 interface Props {
   linkEditState?: { link?: LinkType; mode: "update" | "create" };
 }
+
 export const LinkShortenerForm = ({ linkEditState }: Props) => {
   const { user } = useAppSelector(({ user }) => user);
   const [link, setLink] = useState<LinkType>();
@@ -48,25 +49,21 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
   }, [linkEditState?.mode]);
 
   const getDiffDays = useMemo(() => {
-    return dayjs(linkEditState?.link?.expiresAt).diff(dayjs(), "day");
+    return dayjs(linkEditState?.link?.expiresAt).diff(
+      dayjs().startOf("day"),
+      "day"
+    );
   }, [linkEditState?.link?.expiresAt]);
 
   const form = useForm<ILinkShortenerSchema>({
     resolver: yupResolver(LinkShortenerSchema),
     defaultValues: {
       url: "",
-      expiry_time: "",
+      expiry_time: null,
     },
   });
 
   const { isValid, isDirty, isSubmitting } = form.formState;
-
-  useEffect(() => {
-    form.reset({
-      url: linkEditState?.link?.longUrl,
-      expiry_time: String(getDiffDays),
-    });
-  }, [form, getDiffDays, linkEditState?.link?.longUrl]);
 
   const onSubmit: SubmitHandler<ILinkShortenerSchema> = async (value) => {
     const mutation = isUpdateble ? updateLinkMutation : createLinkMutation;
@@ -121,6 +118,13 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
     });
   };
 
+  useEffect(() => {
+    form.reset({
+      url: linkEditState?.link?.longUrl,
+      expiry_time: getDiffDays as unknown as string,
+    });
+  }, [form, getDiffDays, linkEditState?.link?.longUrl]);
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -147,7 +151,8 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
                     <FormLabel>Link expiry time after:</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value as string}
+                      defaultValue=""
+                      value={field.value ?? ""}
                     >
                       <FormControl className="w-full">
                         <SelectTrigger>
