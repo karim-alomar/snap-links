@@ -217,14 +217,14 @@ export const clickLink = async (req: Request, res: Response) => {
     const deviceType = getDeviceType(userAgent);
     const link = await getLinkById(Number(id));
 
-    if (!link) {
-      res.json({
-        messages: {
-          success: "The link you are trying to update does not exist!",
-        },
-      });
-      return;
-    }
+    // if (!link) {
+    //   res.json({
+    //     messages: {
+    //       success: "The link you are trying to update does not exist!",
+    //     },
+    //   });
+    //   return;
+    // }
 
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     const locationData = await getUserLocationData(ip as string);
@@ -240,7 +240,7 @@ export const clickLink = async (req: Request, res: Response) => {
         device: deviceType,
       },
     });
-    const shortUrl = "rebrand.ly/vpz4xmq";
+    const shortUrl = "https://rebrand.ly/vpz4xmq";
     res.redirect(shortUrl);
     // res.json({
     //   data: linkAnalytics,
