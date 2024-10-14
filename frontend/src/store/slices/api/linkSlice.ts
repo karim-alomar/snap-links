@@ -36,12 +36,6 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    clickLink: builder.mutation<APIActionResponse<LinkType>, { id: number }>({
-      query: ({ id }) => ({
-        url: `/links/${id}/click-link`,
-        method: "POST",
-      }),
-    }),
   }),
 });
 
@@ -50,6 +44,5 @@ export const {
   useCreateLinkMutation,
   useUpdateLinkMutation,
   useDeleteLinkMutation,
-  useClickLinkMutation,
   util: { updateQueryData: updateLinksQueryData },
 } = extendedApiSlice;

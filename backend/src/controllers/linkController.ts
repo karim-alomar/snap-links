@@ -4,15 +4,14 @@ import { Details } from "express-useragent";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
 import { getLinkByCode, getLinkById } from "../actions/getLinkById";
+import { ENDPOINT } from "../secret";
 import {
   daysToSeconds,
   generateShortLink,
   getDeviceType,
   getUserLocationData,
   randomUUID,
-  shortenUrl,
 } from "../utils";
-import { ENDPOINT } from "../secret";
 
 export const fetchLinks = async (req: Request, res: Response) => {
   try {
