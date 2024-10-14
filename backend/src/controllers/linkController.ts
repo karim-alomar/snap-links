@@ -12,6 +12,7 @@ import {
   randomUUID,
   shortenUrl,
 } from "../utils";
+import { ENDPOINT } from "../secret";
 
 export const fetchLinks = async (req: Request, res: Response) => {
   try {
@@ -82,7 +83,7 @@ export const createLink = async (req: Request, res: Response) => {
     const user = await getUserByToken(token as string);
 
     const linkData = {
-      shortUrl: `https://snaplinksbe.vercel.app/api/${uniqCode}`,
+      shortUrl: `${ENDPOINT}/${uniqCode}`,
       longUrl: url,
       code: uniqCode,
     };
@@ -146,7 +147,7 @@ export const updateLink = async (req: Request, res: Response) => {
 
     if (url !== currentLink?.longUrl) {
       const uniqCode = generateShortLink();
-      shortUrl = `https://snaplinksbe.vercel.app/api/${uniqCode}`;
+      shortUrl = `${ENDPOINT}/${uniqCode}`;
     }
 
     if (expiry_time) {
@@ -233,7 +234,6 @@ export const clickLink = async (req: Request, res: Response) => {
       data: {
         linkId: Number(link?.id),
         country: locationData?.country_code,
-        // timezone: locationData?.country.timezone.code,
         city: locationData?.city,
         region: locationData?.region_name,
         browser: userAgent?.browser,
@@ -241,7 +241,6 @@ export const clickLink = async (req: Request, res: Response) => {
       },
     });
 
-    const shortUrl = "https://rebrand.ly/vpz4xmq";
     res.redirect((link?.longUrl as string) ?? "");
   } catch (error: any) {
     res.json({
