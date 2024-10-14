@@ -5,4 +5,4 @@ dotenv.config({ path: ".env" });
 export const PORT = process.env.PORT;
 export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY!;
 export const IPSTACK_API_KEY = process.env.IPSTACK_API_KEY!;
-export const ENDPOINT = process.env.ENDPOINT!;
+export const DOMAIN_NAME = process.env.DOMAIN_NAME!;
