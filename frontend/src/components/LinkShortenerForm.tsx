@@ -55,7 +55,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
     resolver: yupResolver(LinkShortenerSchema),
     defaultValues: {
       url: "",
-      expiry_time: null,
+      expiry_time: "",
     },
   });
 
@@ -64,7 +64,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
   useEffect(() => {
     form.reset({
       url: linkEditState?.link?.longUrl,
-      expiry_time: getDiffDays,
+      expiry_time: String(getDiffDays),
     });
   }, [form, getDiffDays, linkEditState?.link?.longUrl]);
 
@@ -141,7 +141,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
                     <FormLabel>Link expiry time after:</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={String(field.value)}
+                      value={field.value as string}
                     >
                       <FormControl className="w-full">
                         <SelectTrigger>
