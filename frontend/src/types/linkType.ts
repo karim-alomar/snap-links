@@ -9,6 +9,7 @@ export interface LinkType {
   user: User;
   linkAnalytics: LinkAnalytics[];
   expiresAt?: Date;
+  status?: "Expired" | "Active";
   updatedAt: Date;
   createdAt: Date;
 }
