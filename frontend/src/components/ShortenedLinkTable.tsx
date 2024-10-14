@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components";
 import { useAppDispatch, useAppSelector, useToast } from "@/hooks";
+import { cn } from "@/lib/utils";
 import {
   updateLinksQueryData,
   useDeleteLinkMutation,
@@ -22,7 +23,7 @@ import {
 import { APIActionResponse, LinkType, MessagesType } from "@/types";
 import dayjs from "dayjs";
 import { BarChart, Edit, Eye, Loader2, Trash } from "lucide-react";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { Dispatch, SetStateAction } from "react";
 import QRCode from "react-qr-code";
 
 interface Props {
@@ -39,13 +40,6 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
   const dispatch = useAppDispatch();
   const { data: links } = useFetchLinksQuery();
   const [deleteLinkMutation, { isLoading }] = useDeleteLinkMutation();
-
-  const getDiffDays = useMemo(
-    () => (expiresAt?: Date) => {
-      return dayjs(expiresAt).diff(dayjs(), "day");
-    },
-    []
-  );
 
   const handleDelete = async (id: number) => {
     const res = (await deleteLinkMutation({
@@ -88,6 +82,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                 {user && (
                   <>
                     <TableHead>Expiry time</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </>
                 )}
@@ -112,13 +107,27 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                     <QRCode value={link.shortUrl} size={80} />
                   </TableCell>
                   {user && (
-                    <TableCell>
-                      <span>
-                        {getDiffDays(link?.expiresAt)
-                          ? `${getDiffDays(link?.expiresAt)} Days`
-                          : "N/A"}
-                      </span>
-                    </TableCell>
+                    <>
+                      <TableCell>
+                        <span>
+                          {link?.expiresAt
+                            ? `${dayjs(link?.expiresAt).format("DD-MM-YYYY")}`
+                            : "N/A"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={cn(
+                            "text-white rounded-full py-1 px-2",
+                            link.status === "Expired"
+                              ? "bg-destructive"
+                              : "bg-green-500"
+                          )}
+                        >
+                          {link.status}
+                        </span>
+                      </TableCell>
+                    </>
                   )}
                   <TableCell className="flex items-center justify-start gap-2 h-24">
                     <LinkDetailsModal link={link}>
