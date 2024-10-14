@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 import { Details } from "express-useragent";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
-import { getLinkByCode, getLinkById } from "../actions/getLinkById";
-import { ENDPOINT } from "../secret";
+import { getLinkById, getLinkByLinkId } from "../actions/linkHandlers";
+import { DOMAIN_NAME } from "../secret";
 import {
   daysToSeconds,
   generateShortLink,
@@ -78,13 +78,13 @@ export const createLink = async (req: Request, res: Response) => {
       return;
     }
 
-    const uniqCode = generateShortLink();
+    const uniqLinkId = generateShortLink();
     const user = await getUserByToken(token as string);
 
     const linkData = {
-      shortUrl: `${ENDPOINT}/${uniqCode}`,
+      shortUrl: `${DOMAIN_NAME}/${uniqLinkId}`,
       longUrl: url,
-      code: uniqCode,
+      linkId: uniqLinkId,
     };
 
     if (user) {
@@ -201,17 +201,17 @@ export const deleteLink = async (req: Request, res: Response) => {
   }
 };
 
-export const trackingLink = async (req: Request, res: Response) => {
+export const linkTracking = async (req: Request, res: Response) => {
   try {
-    const { code } = req.params;
+    const { linkId } = req.params;
     const userAgent = req.useragent as Details;
     const deviceType = getDeviceType(userAgent);
-    const link = await getLinkByCode(code);
+    const link = await getLinkByLinkId(linkId);
 
     if (!link) {
       res.json({
         messages: {
-          success: "The link you are trying to update does not exist!",
+          error: "The link you are trying to update does not exist!",
         },
       });
       return;

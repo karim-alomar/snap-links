@@ -14,11 +14,11 @@ export const getLinkById = async (id: number) => {
   }
 };
 
-export const getLinkByCode = async (code: string) => {
+export const getLinkByLinkId = async (linkId: string) => {
   try {
     const link = await db.link.findUnique({
       where: {
-        code,
+        linkId,
       },
     });
 
