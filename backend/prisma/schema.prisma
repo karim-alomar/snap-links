@@ -24,6 +24,7 @@ model Link {
   guestId       String?
   shortUrl      String
   longUrl       String
+  code          String          @unique
   user          User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   linkAnalytics LinkAnalytics[]
   expiresAt     DateTime?

@@ -14,6 +14,6 @@ linkRouter.post("/links", createLink);
 linkRouter.put("/links/:id", updateLink);
 linkRouter.delete("/links/:id", deleteLink);
 // linkRouter.post("/links/:id/click-link", clickLink);
-linkRouter.get("/:id", clickLink);
+linkRouter.get("/:code", clickLink);
 
 export default linkRouter;

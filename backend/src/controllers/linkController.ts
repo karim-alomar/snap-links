@@ -3,9 +3,10 @@ import { Request, Response } from "express";
 import { Details } from "express-useragent";
 import { db } from "../../db";
 import { getUserByToken } from "../actions/auth";
-import { getLinkById } from "../actions/getLinkById";
+import { getLinkByCode, getLinkById } from "../actions/getLinkById";
 import {
   daysToSeconds,
+  generateShortLink,
   getDeviceType,
   getUserLocationData,
   randomUUID,
@@ -77,24 +78,22 @@ export const createLink = async (req: Request, res: Response) => {
       return;
     }
 
-    // const shortUrl = await shortenUrl(url);
-    const shortUrl = "rebrand.ly/vpz4xmq";
+    const uniqCode = generateShortLink();
     const user = await getUserByToken(token as string);
 
-    if (expiry_time) {
-      expiryTime = new Date(
-        new Date().getTime() + daysToSeconds(Number(expiry_time + 1)) * 1000
-      );
-    }
-
-    console.log(shortUrl.split("/")[1]);
-
     const linkData = {
-      shortUrl: `https://snaplinks.vercel.app/${shortUrl.split("/")[1]}`,
+      shortUrl: `https://snaplinksbe.vercel.app/api/${uniqCode}`,
       longUrl: url,
+      code: uniqCode,
     };
 
     if (user) {
+      if (expiry_time) {
+        expiryTime = new Date(
+          new Date().getTime() + daysToSeconds(Number(expiry_time + 1)) * 1000
+        );
+      }
+
       link = await db.link.create({
         data: {
           ...linkData,
@@ -146,7 +145,8 @@ export const updateLink = async (req: Request, res: Response) => {
     const currentLink = await getLinkById(Number(id));
 
     if (url !== currentLink?.longUrl) {
-      shortUrl = await shortenUrl(url);
+      const uniqCode = generateShortLink();
+      shortUrl = `https://snaplinksbe.vercel.app/api/${uniqCode}`;
     }
 
     if (expiry_time) {
@@ -212,26 +212,26 @@ export const deleteLink = async (req: Request, res: Response) => {
 
 export const clickLink = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { code } = req.params;
     const userAgent = req.useragent as Details;
     const deviceType = getDeviceType(userAgent);
-    const link = await getLinkById(Number(id));
+    const link = await getLinkByCode(code);
 
-    // if (!link) {
-    //   res.json({
-    //     messages: {
-    //       success: "The link you are trying to update does not exist!",
-    //     },
-    //   });
-    //   return;
-    // }
+    if (!link) {
+      res.json({
+        messages: {
+          success: "The link you are trying to update does not exist!",
+        },
+      });
+      return;
+    }
 
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     const locationData = await getUserLocationData(ip as string);
 
-    const linkAnalytics = await db.linkAnalytics.create({
+    await db.linkAnalytics.create({
       data: {
-        linkId: Number(id),
+        linkId: Number(link?.id),
         country: locationData?.country_code,
         // timezone: locationData?.country.timezone.code,
         city: locationData?.city,
@@ -240,12 +240,9 @@ export const clickLink = async (req: Request, res: Response) => {
         device: deviceType,
       },
     });
+
     const shortUrl = "https://rebrand.ly/vpz4xmq";
-    res.redirect(shortUrl);
-    // res.json({
-    //   data: linkAnalytics,
-    //   messages: { success: "Success" },
-    // });
+    res.redirect((link?.longUrl as string) ?? "");
   } catch (error: any) {
     res.json({
       messages: { error: error.message },
