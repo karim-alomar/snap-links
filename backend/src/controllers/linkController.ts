@@ -55,7 +55,9 @@ export const fetchLinks = async (req: Request, res: Response) => {
     links = links.map((link) => ({
       ...link,
       status:
-        new Date(link?.expiresAt as Date) < new Date() ? "Expired" : "Active",
+        new Date(link?.expiresAt as Date) > new Date() || !link?.expiresAt
+          ? "Active"
+          : "Expired",
     }));
     res.json({
       data: links,
