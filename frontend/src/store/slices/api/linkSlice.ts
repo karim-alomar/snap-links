@@ -12,7 +12,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
     }),
     createLink: builder.mutation<
       APIActionResponse<LinkType>,
-      { url: string; expiry_time?: number | string | null }
+      { url: string; expiry_time?: Date | null }
     >({
       query: (data) => ({
         url: "/links",
@@ -22,7 +22,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
     }),
     updateLink: builder.mutation<
       APIActionResponse<LinkType>,
-      { id?: number; url: string; expiry_time?: number | string | null }
+      { id?: number; url: string; expiry_time?: Date | null }
     >({
       query: ({ id, ...data }) => ({
         url: `/links/${id}`,
