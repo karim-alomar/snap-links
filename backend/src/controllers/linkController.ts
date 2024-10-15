@@ -6,7 +6,6 @@ import { getUserByToken } from "../actions/auth";
 import { getLinkById, getLinkByLinkId } from "../actions/linkHandlers";
 import { BASE_URL } from "../secret";
 import {
-  daysToSeconds,
   generateShortLink,
   getDeviceType,
   getUserLocationData,
@@ -75,7 +74,6 @@ export const createLink = async (req: Request, res: Response) => {
     const guestId = req.headers["guest_id"] as string;
     const token = req.headers["access_token"] as string;
     let link;
-    let expiryTime;
 
     if (!url) {
       res.status(400).json({
@@ -94,17 +92,11 @@ export const createLink = async (req: Request, res: Response) => {
     };
 
     if (user) {
-      if (expiry_time) {
-        expiryTime = new Date(
-          new Date().getTime() + daysToSeconds(Number(expiry_time)) * 1000
-        );
-      }
-
       link = await db.link.create({
         data: {
           ...linkData,
           userId: user?.id,
-          expiresAt: expiryTime,
+          expiresAt: expiry_time,
         },
         include: {
           linkAnalytics: true,
@@ -112,6 +104,7 @@ export const createLink = async (req: Request, res: Response) => {
       });
     } else {
       const newGuestId = guestId || randomUUID();
+
       link = await db.link.create({
         data: {
           ...linkData,
@@ -138,7 +131,6 @@ export const updateLink = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { url, expiry_time } = req.body;
-    let expiryTime;
 
     if (!url) {
       res.status(400).json({
@@ -147,19 +139,13 @@ export const updateLink = async (req: Request, res: Response) => {
       return;
     }
 
-    if (expiry_time) {
-      expiryTime = new Date(
-        new Date().getTime() + daysToSeconds(Number(expiry_time)) * 1000
-      );
-    }
-
     const link = await db.link.update({
       where: {
         id: Number(id),
       },
       data: {
         longUrl: url,
-        expiresAt: expiryTime,
+        expiresAt: expiry_time,
       },
       include: {
         linkAnalytics: true,
