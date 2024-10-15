@@ -1,7 +1,7 @@
 import { LinkShortenerForm, ShortenedLinkTable } from "@/components";
+import { authContext } from "@/context";
 import { LinkType } from "@/types";
-import { useState } from "react";
-import { useAppSelector } from "./hooks";
+import { useContext, useState } from "react";
 
 const App = () => {
   const [linkEditState, setLinkEditState] = useState<{
@@ -11,13 +11,13 @@ const App = () => {
     link: undefined,
     mode: "create",
   });
-  const { user } = useAppSelector(({ user }) => user);
+  const { user } = useContext(authContext);
 
   return (
     <div className="mt-5 space-y-3">
       {user && (
         <div className="flex flex-col items-start justify-start">
-          <span className="text-2xl font-bold">Hi, {user?.name}👋</span>
+          <span className="text-2xl font-bold">Hi, {user.name}👋</span>
           <span className="text-black/50">{user.email}</span>
         </div>
       )}

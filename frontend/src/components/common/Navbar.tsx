@@ -1,10 +1,12 @@
 import { Button } from "@/components";
-import { useAppSelector, useAuth } from "@/hooks";
+import { authContext } from "@/context";
+import { useAuth } from "@/hooks";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 
 export const Navbar = () => {
   const { logout } = useAuth();
-  const { user } = useAppSelector(({ user }) => user);
+  const { user } = useContext(authContext);
 
   return (
     <div className="flex items-center justify-between py-3 border-b">

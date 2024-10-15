@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components";
-import { useAppDispatch, useAppSelector, useToast } from "@/hooks";
+import { authContext } from "@/context";
+import { useAppDispatch, useToast } from "@/hooks";
 import { cn } from "@/lib/utils";
 import {
   updateLinksQueryData,
@@ -23,7 +24,7 @@ import {
 import { APIActionResponse, LinkType, MessagesType } from "@/types";
 import dayjs from "dayjs";
 import { BarChart, Edit, Eye, Loader2, Trash } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import QRCode from "react-qr-code";
 
 interface Props {
@@ -35,7 +36,7 @@ interface Props {
   >;
 }
 export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
-  const { user } = useAppSelector(({ user }) => user);
+  const { user } = useContext(authContext);
   const { toast } = useToast();
   const dispatch = useAppDispatch();
   const { data: links } = useFetchLinksQuery();

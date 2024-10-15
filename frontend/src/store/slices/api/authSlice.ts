@@ -1,9 +1,20 @@
-import { APIActionResponse, APIResponse, User } from "@/types";
+import {
+  APIActionResponse,
+  APIResponse,
+  APIResponseDatum,
+  User,
+} from "@/types";
 import { apiSlice } from "./apiSlice";
 
 export const extendedApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
+    auth: builder.query<APIResponseDatum<User>, void>({
+      query: () => ({
+        url: "/auth",
+        method: "GET",
+      }),
+    }),
     login: builder.mutation<
       APIResponse<User>,
       Pick<User, "email" | "password">
@@ -27,4 +38,5 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = extendedApiSlice;
+export const { useAuthQuery, useLoginMutation, useRegisterMutation } =
+  extendedApiSlice;

@@ -1,28 +1,36 @@
-import { useAppDispatch, useAppSelector } from "@/hooks";
-import { fetchAuth } from "@/store/slices/user-slice";
+import { useAuthQuery } from "@/store/slices/api/authSlice";
+import { User } from "@/types";
 import Cookies from "js-cookie";
 import { createContext, ReactNode, useEffect } from "react";
 
-const authContext = createContext({});
+interface AuthContextProps {
+  user?: User;
+  isLoading?: boolean;
+}
 
-interface Props {
+// eslint-disable-next-line react-refresh/only-export-components
+export const authContext = createContext<AuthContextProps>({});
+
+interface AuthProviderProps {
   children: ReactNode;
 }
-export const AuthProvider = ({ children }: Props) => {
-  const { status } = useAppSelector(({ user }) => user);
-  const dispatch = useAppDispatch();
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const token = Cookies.get("access_token");
+  const { data, isLoading, isError } = useAuthQuery(undefined, {
+    skip: !token,
+  });
 
   useEffect(() => {
-    if (token) {
-      dispatch(fetchAuth());
-      if (status === "failed") {
-        Cookies.remove("access_token");
-        Cookies.remove("guest_id");
-      }
+    if (isError) {
+      Cookies.remove("access_token");
+      Cookies.remove("guest_id");
     }
-  }, [dispatch, token, status]);
+  }, [isError]);
 
-  const value = {};
+  const user = data?.data;
+  const value = {
+    user,
+    isLoading,
+  };
   return <authContext.Provider value={value}>{children}</authContext.Provider>;
 };

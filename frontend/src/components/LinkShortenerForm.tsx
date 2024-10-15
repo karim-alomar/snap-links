@@ -18,7 +18,8 @@ import {
   SelectValue,
   SubmitButton,
 } from "@/components";
-import { useAppDispatch, useAppSelector, useToast } from "@/hooks";
+import { authContext } from "@/context";
+import { useAppDispatch, useToast } from "@/hooks";
 import { ILinkShortenerSchema, LinkShortenerSchema } from "@/shcemas";
 import {
   updateLinksQueryData,
@@ -29,7 +30,7 @@ import { APIActionResponse, LinkType } from "@/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface Props {
@@ -37,7 +38,7 @@ interface Props {
 }
 
 export const LinkShortenerForm = ({ linkEditState }: Props) => {
-  const { user } = useAppSelector(({ user }) => user);
+  const { user } = useContext(authContext);
   const [link, setLink] = useState<LinkType>();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
