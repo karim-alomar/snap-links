@@ -1,4 +1,6 @@
 import {
+  Button,
+  Calendar,
   Card,
   CardContent,
   CardHeader,
@@ -11,15 +13,14 @@ import {
   FormMessage,
   InputControl,
   LinkComponent,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SubmitButton,
 } from "@/components";
 import { authContext } from "@/context";
 import { useAppDispatch, useToast } from "@/hooks";
+import { cn } from "@/lib/utils";
 import { ILinkShortenerSchema, LinkShortenerSchema } from "@/shcemas";
 import {
   updateLinksQueryData,
@@ -30,6 +31,7 @@ import { APIActionResponse, LinkType } from "@/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
+import { CalendarIcon } from "lucide-react";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -48,13 +50,6 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
   const isUpdateble = useMemo(() => {
     return linkEditState?.mode === "update";
   }, [linkEditState?.mode]);
-
-  const getDiffDays = useMemo(() => {
-    return dayjs(linkEditState?.link?.expiresAt).diff(
-      dayjs().startOf("day"),
-      "day"
-    );
-  }, [linkEditState?.link?.expiresAt]);
 
   const form = useForm<ILinkShortenerSchema>({
     resolver: yupResolver(LinkShortenerSchema),
@@ -124,9 +119,9 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
   useEffect(() => {
     form.reset({
       url: linkEditState?.link?.longUrl,
-      expiry_time: getDiffDays as unknown as string,
+      expiry_time: linkEditState?.link?.expiresAt,
     });
-  }, [form, getDiffDays, linkEditState?.link?.longUrl]);
+  }, [form, linkEditState?.link]);
 
   return (
     <Card className="mb-6">
@@ -135,8 +130,16 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <div className="w-full">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid grid-cols-12 gap-3 items-end"
+          >
+            <div
+              className={cn(
+                "col-span-12",
+                user ? "lg:col-span-9" : "lg:col-span-11"
+              )}
+            >
               <InputControl
                 control={form.control}
                 inputLabel="URL to shorten"
@@ -150,26 +153,38 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
                 control={form.control}
                 name="expiry_time"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link expiry time after:</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue=""
-                      value={field.value ?? ""}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a verified email to display" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Array.from({ length: 10 }).map((_, i) => (
-                          <SelectItem key={i} value={String(i + 1)}>
-                            <span>{`${i + 1} Day`}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <FormItem className="lg:col-span-2 col-span-12 flex flex-col">
+                    <FormLabel>Date of birth</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            size="lg"
+                            className={cn(
+                              "px-3 h-[46px]",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              dayjs(field.value).format("DD-MM-YYYY")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value as Date}
+                          onSelect={field.onChange}
+                          disabled={(date) => date <= new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -179,7 +194,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
               title="Shorten"
               isDisabled={!isValid || !isDirty || isSubmitting}
               isLoading={isSubmitting}
-              className="w-full"
+              className="lg:col-span-1 col-span-12 h-[46px]"
             />
           </form>
         </Form>
