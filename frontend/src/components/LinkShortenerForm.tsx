@@ -56,6 +56,7 @@ export const LinkShortenerForm = ({
   linkEditState,
   setLinkEditState,
 }: Props) => {
+  const [popoverState, setPopoverState] = useState(false);
   const { user } = useContext(authContext);
   const [link, setLink] = useState<LinkType>();
   const dispatch = useAppDispatch();
@@ -178,7 +179,10 @@ export const LinkShortenerForm = ({
                 render={({ field }) => (
                   <FormItem className="lg:col-span-2 col-span-12 flex flex-col">
                     <FormLabel>Link expiry date:</FormLabel>
-                    <Popover>
+                    <Popover
+                      open={popoverState}
+                      onOpenChange={() => setPopoverState((prev) => !prev)}
+                    >
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
@@ -202,7 +206,10 @@ export const LinkShortenerForm = ({
                         <Calendar
                           mode="single"
                           selected={field.value as Date}
-                          onSelect={field.onChange}
+                          onSelect={(e) => {
+                            setPopoverState(false);
+                            field.onChange(e);
+                          }}
                           disabled={(date) => date <= new Date()}
                           initialFocus
                         />
