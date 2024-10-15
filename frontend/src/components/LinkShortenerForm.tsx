@@ -32,14 +32,30 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 import { CalendarIcon } from "lucide-react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface Props {
   linkEditState?: { link?: LinkType; mode: "update" | "create" };
+  setLinkEditState?: Dispatch<
+    SetStateAction<{
+      link?: LinkType;
+      mode: "update" | "create";
+    }>
+  >;
 }
 
-export const LinkShortenerForm = ({ linkEditState }: Props) => {
+export const LinkShortenerForm = ({
+  linkEditState,
+  setLinkEditState,
+}: Props) => {
   const { user } = useContext(authContext);
   const [link, setLink] = useState<LinkType>();
   const dispatch = useAppDispatch();
@@ -100,19 +116,26 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
         title: "Link updated successfully",
         variant: "success",
       });
-      return;
+    } else {
+      dispatch(
+        updateLinksQueryData("fetchLinks", undefined, (draft) => {
+          draft.data.unshift({
+            ...data,
+            status: "Active",
+          });
+        })
+      );
+
+      toast({
+        title: "Link created successfully",
+        variant: "success",
+      });
     }
-    dispatch(
-      updateLinksQueryData("fetchLinks", undefined, (draft) => {
-        draft.data.unshift({
-          ...data,
-          status: "Active",
-        });
-      })
-    );
-    toast({
-      title: "Link created successfully",
-      variant: "success",
+
+    form.reset();
+    setLinkEditState?.({
+      link: undefined,
+      mode: "create",
     });
   };
 
@@ -154,7 +177,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
                 name="expiry_time"
                 render={({ field }) => (
                   <FormItem className="lg:col-span-2 col-span-12 flex flex-col">
-                    <FormLabel>Date of birth</FormLabel>
+                    <FormLabel>Link expiry date:</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -169,7 +192,7 @@ export const LinkShortenerForm = ({ linkEditState }: Props) => {
                             {field.value ? (
                               dayjs(field.value).format("DD-MM-YYYY")
                             ) : (
-                              <span>Pick a date</span>
+                              <span>Pick expiry date</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>

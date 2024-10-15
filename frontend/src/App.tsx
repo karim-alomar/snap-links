@@ -22,7 +22,10 @@ const App = () => {
         </div>
       )}
       <div>
-        <LinkShortenerForm linkEditState={linkEditState} />
+        <LinkShortenerForm
+          linkEditState={linkEditState}
+          setLinkEditState={setLinkEditState}
+        />
         <ShortenedLinkTable setLinkEditState={setLinkEditState} />
       </div>
     </div>
