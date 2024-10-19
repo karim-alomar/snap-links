@@ -1,9 +1,9 @@
 import {
   LinkShortenerForm,
   ShortenedLinkTable,
-  BrowserUsageChart,
-  DeviceUsageChart,
-  CountryAnalyticsChart,
+  BrowserUsageChartContainer,
+  DeviceUsageChartContainer,
+  CountryAnalyticsChartContainer,
 } from "@/components";
 import { authContext } from "@/context";
 import { LinkType } from "@/types";
@@ -30,9 +30,9 @@ const App = () => {
       <div>
         {user && (
           <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1  mb-6 gap-3">
-            <BrowserUsageChart />
-            <DeviceUsageChart />
-            <CountryAnalyticsChart />
+            <BrowserUsageChartContainer />
+            <DeviceUsageChartContainer />
+            <CountryAnalyticsChartContainer />
           </div>
         )}
         <LinkShortenerForm
