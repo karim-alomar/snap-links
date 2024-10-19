@@ -46,7 +46,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
     try {
       await navigator.clipboard.writeText(text);
       toast({
-        title: "Text copid successfully",
+        title: "Text copied successfully",
         variant: "success",
       });
     } catch (error) {
