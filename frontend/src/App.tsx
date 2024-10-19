@@ -1,4 +1,10 @@
-import { LinkShortenerForm, ShortenedLinkTable } from "@/components";
+import {
+  LinkShortenerForm,
+  ShortenedLinkTable,
+  BrowserUsageChart,
+  DeviceUsageChart,
+  CountryAnalyticsChart,
+} from "@/components";
 import { authContext } from "@/context";
 import { LinkType } from "@/types";
 import { useContext, useState } from "react";
@@ -22,6 +28,13 @@ const App = () => {
         </div>
       )}
       <div>
+        {user && (
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1  mb-6 gap-3">
+            <BrowserUsageChart />
+            <DeviceUsageChart />
+            <CountryAnalyticsChart />
+          </div>
+        )}
         <LinkShortenerForm
           linkEditState={linkEditState}
           setLinkEditState={setLinkEditState}
