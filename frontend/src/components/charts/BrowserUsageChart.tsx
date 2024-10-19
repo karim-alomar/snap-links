@@ -3,31 +3,28 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components";
-import { authContext } from "@/context";
 import { withDataHandling } from "@/hoc";
 import { useGetBrowserAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
+import { BrowserAnalytics } from "@/types";
 import { generateChartConfig } from "@/utils";
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { Label, Legend, Pie, PieChart } from "recharts";
 
-const BrowserUsageChart = () => {
-  const { token } = useContext(authContext);
-  const { data: chartData, isLoading } = useGetBrowserAnalyticsQuery(
-    undefined,
-    {
-      skip: !token,
-    }
-  );
+interface Props {
+  data: BrowserAnalytics[];
+  isLoading: boolean;
+}
 
+const BrowserUsageChart = ({ data, isLoading }: Props) => {
   const chartConfig = useMemo(() => {
     if (!isLoading) {
-      return generateChartConfig(chartData?.data, "browser");
+      return generateChartConfig(data, "browser");
     }
-  }, [chartData?.data, isLoading]);
+  }, [data, isLoading]);
 
   const totalVisitors = useMemo(() => {
-    return chartData?.data.reduce((acc, curr) => acc + curr?.visitors, 0);
-  }, [chartData]);
+    return data.reduce((acc, curr) => acc + curr?.visitors, 0);
+  }, [data]);
 
   return (
     <ChartContainer config={chartConfig} className="mx-auto max-h-[250px]">
@@ -43,7 +40,7 @@ const BrowserUsageChart = () => {
           iconType="circle"
         />
         <Pie
-          data={chartData?.data}
+          data={data}
           dataKey="visitors"
           nameKey="browser"
           innerRadius={60}
@@ -87,18 +84,9 @@ const BrowserUsageChart = () => {
 const EnhancedBrowserUsageChart = withDataHandling(BrowserUsageChart);
 
 export const BrowserUsageChartContainer = () => {
-  const { token } = useContext(authContext);
-  const { data: chartData, isLoading } = useGetBrowserAnalyticsQuery(
-    undefined,
-    {
-      skip: !token,
-    }
-  );
-
   return (
     <EnhancedBrowserUsageChart
-      isLoading={isLoading}
-      data={chartData?.data}
+      useGetDataQuery={useGetBrowserAnalyticsQuery}
       title="Browsers"
       description="This chart shows how many users clicked on the links, organized by
               browser."

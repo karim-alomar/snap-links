@@ -3,28 +3,28 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components";
-import { authContext } from "@/context";
 import { withDataHandling } from "@/hoc";
 import { useGetDeviceAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
+import { DeviceAnalytics } from "@/types";
 import { generateChartConfig } from "@/utils";
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { Label, Legend, Pie, PieChart } from "recharts";
 
-const DeviceUsageChart = () => {
-  const { token } = useContext(authContext);
-  const { data: chartData, isLoading } = useGetDeviceAnalyticsQuery(undefined, {
-    skip: !token,
-  });
+interface Props {
+  data: DeviceAnalytics[];
+  isLoading: boolean;
+}
 
+const DeviceUsageChart = ({ data, isLoading }: Props) => {
   const chartConfig = useMemo(() => {
     if (!isLoading) {
-      return generateChartConfig(chartData?.data, "device");
+      return generateChartConfig(data, "device");
     }
-  }, [chartData?.data, isLoading]);
+  }, [data, isLoading]);
 
   const totalVisitors = useMemo(() => {
-    return chartData?.data.reduce((acc, curr) => acc + curr?.visitors, 0);
-  }, [chartData]);
+    return data.reduce((acc, curr) => acc + curr?.visitors, 0);
+  }, [data]);
 
   return (
     <ChartContainer config={chartConfig} className="mx-auto max-h-[250px]">
@@ -40,7 +40,7 @@ const DeviceUsageChart = () => {
           iconType="circle"
         />
         <Pie
-          data={chartData?.data}
+          data={data}
           dataKey="visitors"
           nameKey="device"
           innerRadius={60}
@@ -84,15 +84,9 @@ const DeviceUsageChart = () => {
 const EnhancedDeviceUsageChart = withDataHandling(DeviceUsageChart);
 
 export const DeviceUsageChartContainer = () => {
-  const { token } = useContext(authContext);
-  const { data: chartData, isLoading } = useGetDeviceAnalyticsQuery(undefined, {
-    skip: !token,
-  });
-
   return (
     <EnhancedDeviceUsageChart
-      isLoading={isLoading}
-      data={chartData?.data}
+      useGetDataQuery={useGetDeviceAnalyticsQuery}
       title="Devices"
       description="This chart shows how many users clicked on the links, organized by
               device."
