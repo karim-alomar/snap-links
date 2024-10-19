@@ -1,6 +1,6 @@
 import { ProtectedComponent } from "@/components";
 import { AuthLayout, RootLayout } from "@/layout";
-import { LoginForm, RegisterForm } from "@/pages";
+import { LoginForm, Profile, RegisterForm } from "@/pages";
 import { store } from "@/store/index.ts";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -35,6 +35,10 @@ const router = createBrowserRouter([
                 element: <RegisterForm />,
               },
             ],
+          },
+          {
+            path: "/profile",
+            element: <Profile />,
           },
         ],
       },

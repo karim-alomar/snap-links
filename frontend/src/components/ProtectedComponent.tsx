@@ -16,6 +16,14 @@ export const ProtectedComponent = () => {
           });
         }
       }
+
+      if (!token) {
+        if (location.pathname.includes("profile")) {
+          return navigate("/", {
+            replace: true,
+          });
+        }
+      }
       return null;
     };
 
