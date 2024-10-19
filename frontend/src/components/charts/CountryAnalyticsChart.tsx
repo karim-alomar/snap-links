@@ -4,16 +4,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components";
 import { authContext } from "@/context";
 import { useGetCountryAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
+import { generateChartConfig } from "@/utils";
 import { ChartPieIcon, Loader2Icon } from "lucide-react";
 import { useContext, useMemo } from "react";
-import { Label, Pie, PieChart } from "recharts";
+import { Label, Legend, Pie, PieChart } from "recharts";
 
 export const CountryAnalyticsChart = () => {
   const { token } = useContext(authContext);
@@ -23,25 +23,11 @@ export const CountryAnalyticsChart = () => {
       skip: !token,
     }
   );
-
-  const chartConfig = {
-    tr: {
-      label: "TR",
-      color: "hsl(var(--chart-5))",
-    },
-    sy: {
-      label: "SY",
-      color: "hsl(var(--chart-4))",
-    },
-    lb: {
-      label: "LB",
-      color: "hsl(var(--chart-3))",
-    },
-    other: {
-      label: "Other",
-      color: "hsl(var(--chart-2))",
-    },
-  } satisfies ChartConfig;
+  const chartConfig = useMemo(() => {
+    if (!isLoading) {
+      return generateChartConfig(chartData?.data, "country");
+    }
+  }, [chartData?.data, isLoading]);
 
   const totalVisitors = useMemo(() => {
     return chartData?.data.reduce((acc, curr) => acc + curr?.visitors, 0);
@@ -71,12 +57,18 @@ export const CountryAnalyticsChart = () => {
             ) : (
               <ChartContainer
                 config={chartConfig}
-                className="mx-auto aspect-square max-h-[250px]"
+                className="mx-auto  max-h-[250px]"
               >
-                <PieChart>
+                <PieChart className="w-full">
                   <ChartTooltip
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Legend
+                    layout="horizontal"
+                    verticalAlign="top"
+                    align="left"
+                    iconType="circle"
                   />
                   <Pie
                     data={

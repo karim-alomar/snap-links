@@ -4,16 +4,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components";
 import { authContext } from "@/context";
 import { useGetDeviceAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
+import { generateChartConfig } from "@/utils";
 import { ChartPieIcon, Loader2Icon } from "lucide-react";
 import { useContext, useMemo } from "react";
-import { Label, Pie, PieChart } from "recharts";
+import { Label, Legend, Pie, PieChart } from "recharts";
 
 export const DeviceUsageChart = () => {
   const { token } = useContext(authContext);
@@ -21,24 +21,11 @@ export const DeviceUsageChart = () => {
     skip: !token,
   });
 
-  const chartConfig = {
-    mobile: {
-      label: "Mobile",
-      color: "hsl(var(--chart-5))",
-    },
-    desktop: {
-      label: "Desktop",
-      color: "hsl(var(--chart-4))",
-    },
-    tablet: {
-      label: "Tablet",
-      color: "hsl(var(--chart-3))",
-    },
-    other: {
-      label: "Other",
-      color: "hsl(var(--chart-2))",
-    },
-  } satisfies ChartConfig;
+  const chartConfig = useMemo(() => {
+    if (!isLoading) {
+      return generateChartConfig(chartData?.data, "device");
+    }
+  }, [chartData?.data, isLoading]);
 
   const totalVisitors = useMemo(() => {
     return chartData?.data.reduce((acc, curr) => acc + curr?.visitors, 0);
@@ -68,12 +55,18 @@ export const DeviceUsageChart = () => {
             ) : (
               <ChartContainer
                 config={chartConfig}
-                className="mx-auto aspect-square max-h-[250px]"
+                className="mx-auto max-h-[250px]"
               >
                 <PieChart>
                   <ChartTooltip
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Legend
+                    layout="horizontal"
+                    verticalAlign="top"
+                    align="left"
+                    iconType="circle"
                   />
                   <Pie
                     data={chartData?.data}
