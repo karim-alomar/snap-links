@@ -8,7 +8,7 @@ import { BASE_URL } from "../secret";
 import {
   generateShortLink,
   getDeviceType,
-  getUserLocationData,
+  fetchUserGeoLocation,
   randomUUID,
 } from "../utils";
 
@@ -208,7 +208,7 @@ export const linkTracking = async (req: Request, res: Response) => {
     }
 
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const locationData = await getUserLocationData(ip as string);
+    const locationData = await fetchUserGeoLocation(ip as string);
 
     await db.linkAnalytics.create({
       data: {

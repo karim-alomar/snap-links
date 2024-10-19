@@ -1,4 +1,4 @@
 export { getDeviceType } from "./getDeviceType";
 export { randomUUID } from "./uuid";
-export { getUserLocationData } from "./getUserLocationData";
+export { fetchUserGeoLocation } from "./fetchUserGeoLocation";
 export { generateShortLink } from "./generateShortLink";
