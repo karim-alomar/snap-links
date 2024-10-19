@@ -66,10 +66,10 @@ const ProfileForm = () => {
     form.setValue("password", "");
   };
   return (
-    <div className="container py-10 space-y-7">
+    <div className="container py-10 px-0 space-y-7">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="mx-auto md:w-2/3 shadow-lg">
+          <Card className="mx-auto md:w-2/3 w-full shadow-lg">
             <CardHeader className="border-b">
               <span className="text-xl font-semibold">User Information</span>
             </CardHeader>

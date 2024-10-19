@@ -101,7 +101,9 @@
     scrollbar-width: none;
   }
 }
-
+.recharts-responsive-container {
+  height: 250px !important;
+}
 .recharts-default-legend {
   @apply flex items-center justify-start gap-2 overflow-x-scroll hide-scrollbar;
 }
