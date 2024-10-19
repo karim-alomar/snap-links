@@ -55,11 +55,18 @@ export const fetchDeviceStats = async (req: Request, res: Response) => {
       },
     });
 
-    const chartData = analyticsData.map((item) => ({
-      device: item.device || "other",
-      visitors: item._count.device,
-      fill: `var(--color-${item.device?.toLowerCase() || "other"})`,
-    }));
+    const chartData = analyticsData.map((item) => {
+      const device =
+        item.device?.toLowerCase() === "unknown" || !item.device
+          ? "other"
+          : item.device.toLocaleLowerCase();
+
+      return {
+        device,
+        visitors: item._count.device,
+        fill: `var(--color-${device})`,
+      };
+    });
 
     res.json({
       data: chartData,
