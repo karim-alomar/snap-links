@@ -10,3 +10,7 @@ export interface BrowserAnalytics extends CommonAnalyticsType {
 export interface DeviceAnalytics extends CommonAnalyticsType {
   device: string;
 }
+
+export interface CountryAnalytics extends CommonAnalyticsType {
+  country: string;
+}
