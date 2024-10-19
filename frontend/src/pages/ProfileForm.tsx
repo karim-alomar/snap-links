@@ -17,7 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useContext } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-const Profile = () => {
+const ProfileForm = () => {
   const { user } = useContext(authContext);
   const dispatch = useAppDispatch();
   const { toast } = useToast();
@@ -113,4 +113,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileForm;
