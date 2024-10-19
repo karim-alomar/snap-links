@@ -10,3 +10,4 @@ export * from "./toast";
 export * from "./toaster";
 export * from "./calendar";
 export * from "./popover";
+export * from "./chart";
