@@ -23,7 +23,7 @@ import {
 } from "@/store/slices/api/linkSlice";
 import { APIActionResponse, LinkType, MessagesType } from "@/types";
 import dayjs from "dayjs";
-import { BarChart, Edit, Eye, Loader2, Trash } from "lucide-react";
+import { BarChart, Copy, Edit, Eye, Loader2, Trash } from "lucide-react";
 import { Dispatch, SetStateAction, useContext } from "react";
 import QRCode from "react-qr-code";
 
@@ -41,6 +41,21 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
   const dispatch = useAppDispatch();
   const { data: links } = useFetchLinksQuery();
   const [deleteLinkMutation, { isLoading }] = useDeleteLinkMutation();
+
+  const handleCopyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Text copid successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: `Failed to copy text: ${error}`,
+        variant: "success",
+      });
+    }
+  };
 
   const handleDelete = async (id: number) => {
     const res = (await deleteLinkMutation({
@@ -136,6 +151,13 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
                         <Eye size={18} />
                       </Button>
                     </LinkDetailsModal>
+                    <Button
+                      onClick={() => handleCopyText(link.shortUrl)}
+                      size="icon"
+                      variant="outline"
+                    >
+                      <Copy size={18} />
+                    </Button>
                     {user && (
                       <>
                         <Button
