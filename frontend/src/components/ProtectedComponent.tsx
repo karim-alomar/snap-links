@@ -1,33 +1,25 @@
+import { authRoutes, protectedRoutes } from "@/routes";
 import Cookies from "js-cookie";
-import { useLayoutEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 export const ProtectedComponent = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const token = Cookies.get("access_token");
 
-  useLayoutEffect(() => {
-    const redirectUser = () => {
-      if (token) {
-        if (location.pathname.includes("auth")) {
-          return navigate("/", {
-            replace: true,
-          });
-        }
-      }
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    location.pathname.includes(route)
+  );
+  const isAuthRoute = authRoutes.some((route) =>
+    location.pathname.includes(route)
+  );
 
-      if (!token) {
-        if (location.pathname.includes("profile")) {
-          return navigate("/", {
-            replace: true,
-          });
-        }
-      }
-      return null;
-    };
+  if (!token && isProtectedRoute) {
+    return <Navigate to="auth/login" replace />;
+  }
 
-    redirectUser();
-  }, [navigate, location.pathname, token]);
+  if (token && isAuthRoute) {
+    return <Navigate to="/" replace />;
+  }
+
   return <Outlet />;
 };
