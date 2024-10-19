@@ -33,15 +33,16 @@ model Link {
 }
 
 model LinkAnalytics {
-  id        Int      @id @default(autoincrement())
-  linkId    Int?
-  country   String?
-  timezone  String?
-  city      String?
-  region    String?
-  browser   String?
-  device    String?
-  link      Link?    @relation(fields: [linkId], references: [id], onDelete: Cascade)
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  linkId      Int?
+  countryCode String?
+  country     String?
+  timezone    String?
+  city        String?
+  region      String?
+  browser     String?
+  device      String?
+  link        Link?    @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
 }

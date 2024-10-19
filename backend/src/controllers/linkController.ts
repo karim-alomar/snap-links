@@ -210,10 +210,13 @@ export const linkTracking = async (req: Request, res: Response) => {
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     const locationData = await getUserLocationData(ip as string);
 
+    console.log(locationData);
+
     await db.linkAnalytics.create({
       data: {
         linkId: Number(link?.id),
-        country: locationData?.country_code,
+        countryCode: locationData?.country_code,
+        country: locationData?.country_name,
         city: locationData?.city,
         region: locationData?.region_name,
         browser: userAgent?.browser,
