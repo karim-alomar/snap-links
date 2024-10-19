@@ -50,7 +50,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <AppProvider>
-        <RouterProvider router={router} />;
+        <RouterProvider router={router} />
       </AppProvider>
     </Provider>
   </StrictMode>
