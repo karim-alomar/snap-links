@@ -14,23 +14,15 @@ export const generateChartConfig = (data: any, key: string) => {
       }
     | any = {};
 
-  const colors = [
-    "hsl(var(--chart-1))",
-    "hsl(var(--chart-2))",
-    "hsl(var(--chart-3))",
-    "hsl(var(--chart-4))",
-    "hsl(var(--chart-5))",
-    "hsl(var(--chart-6))",
-    "hsl(var(--chart-7))",
-    "hsl(var(--chart-8))",
-    "hsl(var(--chart-9))",
-    "hsl(var(--chart-10))",
-  ];
+  const generateRandomColor = () => {
+    const randomIndex = Math.floor(Math.random() * 5) + 1;
+    return `hsl(var(--chart-${randomIndex}))`;
+  };
 
-  uniqueKeys.forEach((item: any, index) => {
+  uniqueKeys.forEach((item: any) => {
     chartConfig[item] = {
       label: item.charAt(0).toUpperCase() + item.slice(1),
-      color: colors[index % colors.length],
+      color: generateRandomColor(),
     };
   });
 
