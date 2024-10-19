@@ -91,3 +91,21 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.recharts-default-legend {
+  @apply flex items-center justify-start gap-2 overflow-x-scroll hide-scrollbar;
+}
+
+.recharts-legend-item {
+  @apply min-w-fit;
+}
