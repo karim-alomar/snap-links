@@ -6,6 +6,7 @@ import { createContext, ReactNode, useEffect } from "react";
 interface AuthContextProps {
   user?: User;
   isLoading?: boolean;
+  token?: string;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const value = {
     user,
     isLoading,
+    token,
   };
   return <authContext.Provider value={value}>{children}</authContext.Provider>;
 };
