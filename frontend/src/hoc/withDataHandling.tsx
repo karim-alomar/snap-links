@@ -5,19 +5,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components";
+import { authContext } from "@/context";
 import { ChartPieIcon, Loader2Icon } from "lucide-react";
-import { ComponentType } from "react";
+import { ComponentType, useContext } from "react";
 
 interface Props {
-  isLoading: boolean;
-  data?: any;
+  useGetDataQuery: any;
   title: string;
   description: string;
 }
 
 export const withDataHandling = (WrappedComponent: ComponentType<any>) => {
-  return (props: Props) => {
-    const { isLoading, data, title, description } = props;
+  return (props: Props & { otherQueries?: Record<string, any> }) => {
+    const { useGetDataQuery, title, description } = props;
+    const { token } = useContext(authContext);
+    const { data, isLoading } = useGetDataQuery(undefined, {
+      skip: !token,
+    });
 
     return (
       <Card className="relative flex flex-col min-h-60">
@@ -38,7 +42,11 @@ export const withDataHandling = (WrappedComponent: ComponentType<any>) => {
                   <span>There is no data yet!</span>
                 </div>
               ) : (
-                <WrappedComponent {...props} />
+                <WrappedComponent
+                  data={data.data}
+                  isLoading={isLoading}
+                  {...props}
+                />
               )}
             </CardContent>
           </>

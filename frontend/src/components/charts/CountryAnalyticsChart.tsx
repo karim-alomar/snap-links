@@ -3,18 +3,18 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components";
-import { authContext } from "@/context";
 import { withDataHandling } from "@/hoc";
 import { useGetCountryAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
 import { CountryAnalytics } from "@/types";
 import { generateChartConfig } from "@/utils";
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { Label, Legend, Pie, PieChart } from "recharts";
 
 interface Props {
   data: CountryAnalytics[];
   isLoading: boolean;
 }
+
 const CountryAnalyticsChart = ({ data, isLoading }: Props) => {
   const chartConfig = useMemo(() => {
     if (!isLoading) {
@@ -84,18 +84,9 @@ const CountryAnalyticsChart = ({ data, isLoading }: Props) => {
 const EnhancedCountryAnalyticsChart = withDataHandling(CountryAnalyticsChart);
 
 export const CountryAnalyticsChartContainer = () => {
-  const { token } = useContext(authContext);
-  const { data: chartData, isLoading } = useGetCountryAnalyticsQuery(
-    undefined,
-    {
-      skip: !token,
-    }
-  );
-
   return (
     <EnhancedCountryAnalyticsChart
-      isLoading={isLoading}
-      data={chartData?.data}
+      useGetDataQuery={useGetCountryAnalyticsQuery}
       title="Top Countries"
       description="This chart shows how many users clicked on the links, organized by
               country."
