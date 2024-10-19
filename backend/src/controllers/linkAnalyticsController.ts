@@ -21,7 +21,7 @@ export const fetchBrowserStats = async (req: Request, res: Response) => {
     });
 
     const chartData = analyticsData.map((item) => ({
-      browser: item.browser || "other",
+      browser: item.browser || "Other",
       visitors: item._count.browser,
       fill: `var(--color-${item.browser?.toLowerCase() || "other"})`, // استخدم الألوان المناسبة
     }));
@@ -58,13 +58,13 @@ export const fetchDeviceStats = async (req: Request, res: Response) => {
     const chartData = analyticsData.map((item) => {
       const device =
         item.device?.toLowerCase() === "unknown" || !item.device
-          ? "other"
-          : item.device.toLocaleLowerCase();
+          ? "Other"
+          : item.device;
 
       return {
         device,
         visitors: item._count.device,
-        fill: `var(--color-${device})`,
+        fill: `var(--color-${device.toLowerCase()})`,
       };
     });
 
@@ -98,7 +98,7 @@ export const fetchCountryStats = async (req: Request, res: Response) => {
     });
 
     const chartData = analyticsData.map((item) => ({
-      country: item.country || "other",
+      country: item.country || "Other",
       visitors: item._count.country,
       fill: `var(--color-${item.country?.toLowerCase() || "other"})`,
     }));
