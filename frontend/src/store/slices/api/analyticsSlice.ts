@@ -1,4 +1,9 @@
-import { APIResponse, BrowserAnalytics, DeviceAnalytics } from "@/types";
+import {
+  APIResponse,
+  BrowserAnalytics,
+  DeviceAnalytics,
+  CountryAnalytics,
+} from "@/types";
 import { apiSlice } from "./apiSlice";
 
 export const extendedApiSlice = apiSlice.injectEndpoints({
@@ -16,7 +21,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-    getCountryAnalytics: builder.query<APIResponse<DeviceAnalytics>, void>({
+    getCountryAnalytics: builder.query<APIResponse<CountryAnalytics>, void>({
       query: () => ({
         url: "/country-analytics",
         method: "GET",
