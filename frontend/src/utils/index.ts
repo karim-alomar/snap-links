@@ -1,0 +1,1 @@
+export { generateChartConfig } from "./generateChartConfig";
