@@ -17,6 +17,7 @@ export interface LinkType {
 export interface LinkAnalytics {
   id: number;
   linkId: number;
+  countryCode?: string;
   country?: string;
   timezone?: string;
   city?: string;
