@@ -27,7 +27,7 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
     const countryClickCounts = link?.linkAnalytics?.reduce<
       Record<string, number>
     >((accumulator, analyticsItem) => {
-      const countryName = analyticsItem.country;
+      const countryName = analyticsItem.countryCode;
 
       if (countryName) {
         accumulator[countryName] = (accumulator[countryName] || 0) + 1;
@@ -36,10 +36,10 @@ export const LinkDetailsModal = ({ children, link }: Props) => {
     }, {});
 
     return link?.linkAnalytics?.map((item) => {
-      const country = item.country;
+      const countryCode = item.countryCode;
       return {
-        country: country ?? "tr",
-        value: countryClickCounts[country as string] || 0,
+        country: countryCode ?? "tr",
+        value: countryClickCounts[countryCode as string] || 0,
       };
     });
   }, [link?.linkAnalytics]);
