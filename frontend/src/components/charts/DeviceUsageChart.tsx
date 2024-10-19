@@ -40,7 +40,7 @@ export const DeviceUsageChart = () => {
       ) : (
         <>
           <CardHeader className="pb-0">
-            <CardTitle>Analyzing link traffic by device</CardTitle>
+            <CardTitle>Devices</CardTitle>
             <CardDescription>
               This chart shows how many users clicked on the links, organized by
               device.

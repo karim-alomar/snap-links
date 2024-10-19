@@ -42,7 +42,7 @@ export const CountryAnalyticsChart = () => {
       ) : (
         <>
           <CardHeader className="pb-0">
-            <CardTitle>Analyzing link traffic by country</CardTitle>
+            <CardTitle>Top Countries</CardTitle>
             <CardDescription>
               This chart shows how many users clicked on the links, organized by
               country.

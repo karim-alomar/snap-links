@@ -43,7 +43,7 @@ export const BrowserUsageChart = () => {
       ) : (
         <>
           <CardHeader className="pb-0">
-            <CardTitle>Analyzing link traffic by browser</CardTitle>
+            <CardTitle>Browsers</CardTitle>
             <CardDescription>
               This chart shows how many users clicked on the links, organized by
               browser.
