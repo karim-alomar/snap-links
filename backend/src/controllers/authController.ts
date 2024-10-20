@@ -54,6 +54,14 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
     if (guestId) {
       await db.link.updateMany({
         where: { guestId },
@@ -62,6 +70,7 @@ export const register = async (req: Request, res: Response) => {
     }
     res.json({
       data: user,
+      token,
       messages: {
         success: "Success",
       },
