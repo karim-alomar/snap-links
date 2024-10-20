@@ -36,11 +36,11 @@ const LoginForm = () => {
       value
     )) as unknown as APIActionResponse<User>;
 
-    const { messages, data } = res.data;
+    const { messages, token } = res.data;
 
     if (messages.error) return setValidMessage({ error: messages.error });
 
-    login(data);
+    login(token);
   };
   return (
     <AuthCardWrapper

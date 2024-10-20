@@ -1,15 +1,17 @@
-import { Request, Response } from "express";
-import { hashSync, compareSync } from "bcrypt";
-import { getUserByEmail, getUserByToken } from "../actions/auth";
-import { db } from "../../db";
-import * as jwt from "jsonwebtoken";
-import { JWT_SECRET_KEY } from "../secret";
 import { User } from "@prisma/client";
+import { compareSync, hashSync } from "bcrypt";
+import { Request, Response } from "express";
+import * as jwt from "jsonwebtoken";
+import { db } from "../../db";
+import { getUserByEmail, getUserById } from "../actions/auth";
+import { JWT_SECRET_KEY } from "../secret";
 
 export const auth = async (req: Request, res: Response) => {
-  const token = req.headers["access_token"] as string;
+  const token = req.headers["authorization"] as string;
 
-  const user = await getUserByToken(token);
+  const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as { userId: string };
+
+  const user = await getUserById(decodedToken.userId);
 
   if (!user) {
     res.status(400).json({
@@ -49,12 +51,6 @@ export const register = async (req: Request, res: Response) => {
         name,
         email,
         password: hashPassword,
-        accessToken: jwt.sign(
-          {
-            userId: user?.id,
-          },
-          JWT_SECRET_KEY
-        ),
       },
     });
 
@@ -107,19 +103,11 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        userId: user?.id,
+        userId: user.id,
       },
-      JWT_SECRET_KEY
+      JWT_SECRET_KEY,
+      { expiresIn: "1h" }
     );
-
-    user = await db.user.update({
-      where: {
-        id: user?.id,
-      },
-      data: {
-        accessToken: token,
-      },
-    });
 
     if (guestId) {
       await db.link.updateMany({
@@ -129,6 +117,7 @@ export const login = async (req: Request, res: Response) => {
     }
     res.json({
       data: user,
+      token,
       messages: { success: "Success" },
     });
   } catch (error) {

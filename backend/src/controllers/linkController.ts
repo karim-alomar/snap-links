@@ -1,29 +1,30 @@
-import { Link } from "@prisma/client";
 import { Request, Response } from "express";
 import { Details } from "express-useragent";
+import * as jwt from "jsonwebtoken";
 import { db } from "../../db";
-import { getUserByToken } from "../actions/auth";
+import { getUserById } from "../actions/auth";
 import { getLinkById, getLinkByLinkId } from "../actions/linkHandlers";
-import { BASE_URL } from "../secret";
+import { BASE_URL, JWT_SECRET_KEY } from "../secret";
 import {
+  fetchUserGeoLocation,
   generateShortLink,
   getDeviceType,
-  fetchUserGeoLocation,
   randomUUID,
 } from "../utils";
 
 export const fetchLinks = async (req: Request, res: Response) => {
   try {
     const guestId = req.headers["guest_id"] as string;
-    const token = req.headers["access_token"] as string;
-    let links: Link[] = [];
+    const token = req.headers["authorization"] as string;
 
-    const user = await getUserByToken(token as string);
-
-    if (user) {
-      links = await db.link.findMany({
+    if (token) {
+      const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
+        userId: string;
+      };
+      const user = await getUserById(decodedToken.userId);
+      const links = await db.link.findMany({
         where: {
-          userId: user.id,
+          userId: user?.id,
         },
         orderBy: [
           {
@@ -34,32 +35,42 @@ export const fetchLinks = async (req: Request, res: Response) => {
           linkAnalytics: true,
         },
       });
-    } else {
-      if (guestId) {
-        links = await db.link.findMany({
-          where: {
-            guestId,
-          },
-          orderBy: [
-            {
-              createdAt: "desc",
-            },
-          ],
-          include: {
-            linkAnalytics: true,
-          },
-        });
-      }
+
+      res.status(200).json({
+        data: links.map((link) => ({
+          ...link,
+          status:
+            new Date(link?.expiresAt as Date) > new Date() || !link?.expiresAt
+              ? "Active"
+              : "Expired",
+        })),
+      });
+      return;
     }
-    links = links.map((link) => ({
-      ...link,
-      status:
-        new Date(link?.expiresAt as Date) > new Date() || !link?.expiresAt
-          ? "Active"
-          : "Expired",
-    }));
+
+    if (guestId) {
+      const links = await db.link.findMany({
+        where: {
+          guestId,
+        },
+        orderBy: [
+          {
+            createdAt: "desc",
+          },
+        ],
+        include: {
+          linkAnalytics: true,
+        },
+      });
+
+      res.json({
+        data: links,
+      });
+      return;
+    }
+
     res.json({
-      data: links,
+      data: [],
     });
   } catch (error: any) {
     res.json({
@@ -72,8 +83,7 @@ export const createLink = async (req: Request, res: Response) => {
   try {
     const { url, expiry_time } = req.body;
     const guestId = req.headers["guest_id"] as string;
-    const token = req.headers["access_token"] as string;
-    let link;
+    const token = req.headers["authorization"] as string;
 
     if (!url) {
       res.status(400).json({
@@ -83,7 +93,6 @@ export const createLink = async (req: Request, res: Response) => {
     }
 
     const uniqLinkId = generateShortLink();
-    const user = await getUserByToken(token as string);
 
     const linkData = {
       shortUrl: `${BASE_URL}/${uniqLinkId}`,
@@ -91,8 +100,12 @@ export const createLink = async (req: Request, res: Response) => {
       linkId: uniqLinkId,
     };
 
-    if (user) {
-      link = await db.link.create({
+    if (token) {
+      const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
+        userId: string;
+      };
+      const user = await getUserById(decodedToken.userId);
+      const link = await db.link.create({
         data: {
           ...linkData,
           userId: user?.id,
@@ -102,24 +115,31 @@ export const createLink = async (req: Request, res: Response) => {
           linkAnalytics: true,
         },
       });
-    } else {
-      const newGuestId = guestId || randomUUID();
 
-      link = await db.link.create({
-        data: {
-          ...linkData,
-          guestId: newGuestId,
-        },
-        include: {
-          linkAnalytics: true,
-        },
+      res.json({
+        data: link,
+        messages: { success: "Link shortened successfully" },
       });
+      return;
     }
+
+    const newGuestId = guestId || randomUUID();
+
+    const link = await db.link.create({
+      data: {
+        ...linkData,
+        guestId: newGuestId,
+      },
+      include: {
+        linkAnalytics: true,
+      },
+    });
 
     res.json({
       data: link,
       messages: { success: "Link shortened successfully" },
     });
+    return;
   } catch (error: any) {
     res.json({
       messages: { error: error.message },

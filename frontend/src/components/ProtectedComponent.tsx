@@ -4,7 +4,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 export const ProtectedComponent = () => {
   const location = useLocation();
-  const token = Cookies.get("access_token");
+  const token = Cookies.get("authorization");
 
   const isProtectedRoute = protectedRoutes.some((route) =>
     location.pathname.includes(route)

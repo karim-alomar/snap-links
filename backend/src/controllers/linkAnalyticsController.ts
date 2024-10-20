@@ -1,12 +1,17 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
-import { getUserByToken } from "../actions/auth";
+import { getUserById } from "../actions/auth";
+import { JWT_SECRET_KEY } from "../secret";
+import * as jwt from "jsonwebtoken";
 
 export const fetchBrowserStats = async (req: Request, res: Response) => {
   try {
-    const token = req.headers["access_token"] as string;
+    const token = req.headers["authorization"] as string;
+    const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
+      userId: string;
+    };
 
-    const user = await getUserByToken(token);
+    const user = await getUserById(decodedToken.userId);
 
     const analyticsData = await db.linkAnalytics.groupBy({
       by: ["browser"],
@@ -39,9 +44,12 @@ export const fetchBrowserStats = async (req: Request, res: Response) => {
 
 export const fetchDeviceStats = async (req: Request, res: Response) => {
   try {
-    const token = req.headers["access_token"] as string;
+    const token = req.headers["authorization"] as string;
+    const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
+      userId: string;
+    };
 
-    const user = await getUserByToken(token);
+    const user = await getUserById(decodedToken.userId);
 
     const analyticsData = await db.linkAnalytics.groupBy({
       by: ["device"],
@@ -81,9 +89,12 @@ export const fetchDeviceStats = async (req: Request, res: Response) => {
 
 export const fetchCountryStats = async (req: Request, res: Response) => {
   try {
-    const token = req.headers["access_token"] as string;
+    const token = req.headers["authorization"] as string;
+    const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
+      userId: string;
+    };
 
-    const user = await getUserByToken(token);
+    const user = await getUserById(decodedToken.userId);
 
     const analyticsData = await db.linkAnalytics.groupBy({
       by: ["country"],

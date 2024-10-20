@@ -1,15 +1,21 @@
 import { hashSync } from "bcrypt";
 import { Request, Response } from "express";
+import * as jwt from "jsonwebtoken";
 import { db } from "../../db";
-import { getUserByToken } from "../actions/auth";
+import { getUserById } from "../actions/auth";
+import { JWT_SECRET_KEY } from "../secret";
 
 export const updateProfile = async (req: Request, res: Response) => {
   const { email, name, password } = await req.body;
-  const token = req.headers["access_token"] as string;
+  const token = req.headers["authorization"] as string;
   let user;
   let hashPassword;
 
-  user = await getUserByToken(token);
+  const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
+    userId: string;
+  };
+
+  user = await getUserById(decodedToken.userId);
 
   if (!user) {
     res.status(400).json({

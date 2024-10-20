@@ -1,6 +1,7 @@
 export type APIActionResponse<T> = {
   data: {
     data: T;
+    token?: string;
     messages: MessagesType;
   };
 };

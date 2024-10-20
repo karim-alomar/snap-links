@@ -82,7 +82,7 @@ export const ShortenedLinkTable = ({ setLinkEditState }: Props) => {
   };
 
   return (
-    (links?.data.length as number) > 0 && (
+    (links?.data?.length as number) > 0 && (
       <Card>
         <CardHeader>
           <CardTitle>Your Shortened Links</CardTitle>

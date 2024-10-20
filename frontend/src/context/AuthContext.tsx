@@ -16,14 +16,14 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const token = Cookies.get("access_token");
+  const token = Cookies.get("authorization");
   const { data, isLoading, isError } = useAuthQuery(undefined, {
     skip: !token,
   });
 
   useEffect(() => {
     if (isError) {
-      Cookies.remove("access_token");
+      Cookies.remove("authorization");
       Cookies.remove("guest_id");
     }
   }, [isError]);

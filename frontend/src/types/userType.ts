@@ -5,7 +5,6 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  accessToken: string;
   Links: LinkType;
   updatedAt: Date;
   createdAt: Date;
