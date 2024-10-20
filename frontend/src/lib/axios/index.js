@@ -13,14 +13,14 @@ export const axios = Axios.create({
 axios.interceptors.request.use(
   (config) => {
     const guestId = Cookies.get("guest_id");
-    const accessToken = Cookies.get("access_token");
+    const authorization = Cookies.get("authorization");
 
     if (guestId) {
       config.headers.guest_id = guestId;
     }
 
-    if (accessToken) {
-      config.headers.access_token = accessToken;
+    if (authorization) {
+      config.headers.authorization = authorization;
     }
 
     return config;
