@@ -5,6 +5,7 @@ import * as jwt from "jsonwebtoken";
 import { db } from "../../db";
 import { getUserByEmail, getUserById } from "../actions/auth";
 import { JWT_SECRET_KEY } from "../secret";
+import { generateJWT } from "../utils/generateJWT";
 
 export const auth = async (req: Request, res: Response) => {
   const token = req.headers["authorization"] as string;
@@ -54,14 +55,6 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-      },
-      JWT_SECRET_KEY,
-      { expiresIn: "1h" }
-    );
-
     if (guestId) {
       await db.link.updateMany({
         where: { guestId },
@@ -70,7 +63,7 @@ export const register = async (req: Request, res: Response) => {
     }
     res.json({
       data: user,
-      token,
+      token: generateJWT(user.id),
       messages: {
         success: "Success",
       },
@@ -110,14 +103,6 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-      },
-      JWT_SECRET_KEY,
-      { expiresIn: "1h" }
-    );
-
     if (guestId) {
       await db.link.updateMany({
         where: { guestId },
@@ -126,7 +111,7 @@ export const login = async (req: Request, res: Response) => {
     }
     res.json({
       data: user,
-      token,
+      token: generateJWT(user.id),
       messages: { success: "Success" },
     });
   } catch (error) {
