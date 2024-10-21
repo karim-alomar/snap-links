@@ -9,12 +9,11 @@ import { Label, Legend, Pie, PieChart } from "recharts";
 interface Props {
   data: any[];
   chartConfig: any;
-  nameKey: string;
 }
 
-export const PieChartComponent = ({ data, chartConfig, nameKey }: Props) => {
+export const PieChartComponent = ({ data, chartConfig }: Props) => {
   const totalVisitors = useMemo(() => {
-    return data.reduce((acc, curr) => acc + curr?.visitors, 0);
+    return data?.reduce((acc, curr) => acc + curr?.visitors, 0);
   }, [data]);
 
   return (
@@ -33,7 +32,7 @@ export const PieChartComponent = ({ data, chartConfig, nameKey }: Props) => {
         <Pie
           data={data}
           dataKey="visitors"
-          nameKey={nameKey}
+          nameKey={"key"}
           innerRadius={60}
           strokeWidth={5}
         >

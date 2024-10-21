@@ -1,123 +1,61 @@
+import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
+import * as jwt from "jsonwebtoken";
 import { db } from "../../db";
 import { getUserById } from "../actions/auth";
 import { JWT_SECRET_KEY } from "../secret";
-import * as jwt from "jsonwebtoken";
 
-export const fetchBrowserStats = async (req: Request, res: Response) => {
+export const fetchAnalytics = async (req: Request, res: Response) => {
   try {
     const token = req.headers["authorization"] as string;
     const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
       userId: string;
     };
-
     const user = await getUserById(decodedToken.userId);
 
-    const analyticsData = await db.linkAnalytics.groupBy({
-      by: ["browser"],
-      _count: {
-        browser: true,
-      },
-      where: {
-        link: {
-          userId: user?.id,
-        },
-      },
-    });
-
-    const chartData = analyticsData.map((item) => ({
-      browser: item.browser || "Other",
-      visitors: item._count.browser,
-      fill: `var(--color-${item.browser?.toLowerCase() || "other"})`, // استخدم الألوان المناسبة
-    }));
-
-    res.json({
-      data: chartData,
-      messages: { success: "Success" },
-    });
-  } catch (error: any) {
-    res.json({
-      messages: { error: error.message },
-    });
-  }
-};
-
-export const fetchDeviceStats = async (req: Request, res: Response) => {
-  try {
-    const token = req.headers["authorization"] as string;
-    const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
-      userId: string;
+    const fetchAnalyticsData = async (
+      nameKey: keyof typeof Prisma.LinkAnalyticsScalarFieldEnum
+    ) => {
+      return await db.linkAnalytics.groupBy({
+        by: [nameKey],
+        _count: { [nameKey]: true },
+        where: { link: { userId: user?.id } },
+      });
     };
 
-    const user = await getUserById(decodedToken.userId);
+    const browserData = await fetchAnalyticsData("browser");
+    const countryData = await fetchAnalyticsData("country");
+    const deviceData = await fetchAnalyticsData("device");
 
-    const analyticsData = await db.linkAnalytics.groupBy({
-      by: ["device"],
-      _count: {
-        device: true,
-      },
-      where: {
-        link: {
-          userId: user?.id,
-        },
-      },
-    });
-
-    const chartData = analyticsData.map((item) => {
-      const device =
-        item.device?.toLowerCase() === "unknown" || !item.device
-          ? "Other"
-          : item.device;
-
-      return {
-        device,
-        visitors: item._count.device,
-        fill: `var(--color-${device.toLowerCase()})`,
-      };
-    });
-
-    res.json({
-      data: chartData,
-      messages: { success: "Success" },
-    });
-  } catch (error: any) {
-    res.json({
-      messages: { error: error.message },
-    });
-  }
-};
-
-export const fetchCountryStats = async (req: Request, res: Response) => {
-  try {
-    const token = req.headers["authorization"] as string;
-    const decodedToken = jwt.verify(token, JWT_SECRET_KEY) as {
-      userId: string;
+    const formatChartData = (
+      data: (Prisma.PickEnumerable<
+        Prisma.LinkAnalyticsGroupByOutputType,
+        any[]
+      > & {
+        _count: {
+          [key: string]: number;
+        };
+      })[],
+      nameKey: string
+    ) => {
+      return data.map((item) => ({
+        key: item[nameKey] || "Other",
+        visitors: item._count[nameKey],
+        fill: `var(--color-${item[nameKey]?.toLowerCase() || "other"})`,
+      }));
     };
 
-    const user = await getUserById(decodedToken.userId);
-
-    const analyticsData = await db.linkAnalytics.groupBy({
-      by: ["country"],
-      _count: {
-        country: true,
-      },
-      where: {
-        link: {
-          userId: user?.id,
-        },
-      },
-    });
-
-    const chartData = analyticsData.map((item) => ({
-      country: item.country || "Other",
-      visitors: item._count.country,
-      fill: `var(--color-${item.country?.toLowerCase() || "other"})`,
-    }));
+    const chartData = {
+      browser: formatChartData(browserData, "browser"),
+      country: formatChartData(countryData, "country"),
+      device: formatChartData(deviceData, "device"),
+    };
 
     res.json({
       data: chartData,
       messages: { success: "Success" },
     });
+    return;
   } catch (error: any) {
     res.json({
       messages: { error: error.message },

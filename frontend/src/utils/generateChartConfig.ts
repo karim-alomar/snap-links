@@ -1,7 +1,7 @@
-export const generateChartConfig = (data: any, key: string) => {
+export const generateChartConfig = (data: any) => {
   const uniqueKeys = Array.from(
     new Set(
-      data?.map((item: any) => item?.[key]?.toLowerCase().replace(" ", "_"))
+      data?.map((item: any) => item?.key?.toLowerCase().replace(" ", "_"))
     )
   );
 
@@ -19,9 +19,9 @@ export const generateChartConfig = (data: any, key: string) => {
     return `hsl(var(--chart-${randomIndex}))`;
   };
 
-  uniqueKeys.forEach((item: any) => {
+  uniqueKeys?.forEach((item: any) => {
     chartConfig[item] = {
-      label: item.charAt(0).toUpperCase() + item.slice(1),
+      label: item?.charAt(0).toUpperCase() + item?.slice(1),
       color: generateRandomColor(),
     };
   });

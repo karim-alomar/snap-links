@@ -1,29 +1,23 @@
 import { PieChartComponent } from "@/components";
 import { withDataHandling } from "@/hoc";
-import { useGetBrowserAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
-import { BrowserAnalytics } from "@/types";
+import { useFetchAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
+import { AnalyticsType } from "@/types";
 import { generateChartConfig } from "@/utils";
 import { useMemo } from "react";
 
 interface Props {
-  data: BrowserAnalytics[];
+  data: AnalyticsType;
   isLoading: boolean;
 }
 
 const BrowserUsageChart = ({ data, isLoading }: Props) => {
   const chartConfig = useMemo(() => {
     if (!isLoading) {
-      return generateChartConfig(data, "browser");
+      return generateChartConfig(data.browser);
     }
-  }, [data, isLoading]);
+  }, [data.browser, isLoading]);
 
-  return (
-    <PieChartComponent
-      data={data}
-      chartConfig={chartConfig}
-      nameKey="browser"
-    />
-  );
+  return <PieChartComponent data={data.browser} chartConfig={chartConfig} />;
 };
 
 const EnhancedBrowserUsageChart = withDataHandling(BrowserUsageChart);
@@ -31,7 +25,7 @@ const EnhancedBrowserUsageChart = withDataHandling(BrowserUsageChart);
 export const BrowserUsageChartContainer = () => {
   return (
     <EnhancedBrowserUsageChart
-      useGetDataQuery={useGetBrowserAnalyticsQuery}
+      useGetDataQuery={useFetchAnalyticsQuery}
       title="Browsers"
       description="This chart shows how many users clicked on the links, organized by
               browser."

@@ -1,25 +1,23 @@
 import { PieChartComponent } from "@/components";
 import { withDataHandling } from "@/hoc";
-import { useGetDeviceAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
-import { DeviceAnalytics } from "@/types";
+import { useFetchAnalyticsQuery } from "@/store/slices/api/analyticsSlice";
+import { AnalyticsType } from "@/types";
 import { generateChartConfig } from "@/utils";
 import { useMemo } from "react";
 
 interface Props {
-  data: DeviceAnalytics[];
+  data: AnalyticsType;
   isLoading: boolean;
 }
 
 const DeviceUsageChart = ({ data, isLoading }: Props) => {
   const chartConfig = useMemo(() => {
     if (!isLoading) {
-      return generateChartConfig(data, "device");
+      return generateChartConfig(data.device);
     }
   }, [data, isLoading]);
 
-  return (
-    <PieChartComponent data={data} chartConfig={chartConfig} nameKey="device" />
-  );
+  return <PieChartComponent data={data.device} chartConfig={chartConfig} />;
 };
 
 const EnhancedDeviceUsageChart = withDataHandling(DeviceUsageChart);
@@ -27,7 +25,7 @@ const EnhancedDeviceUsageChart = withDataHandling(DeviceUsageChart);
 export const DeviceUsageChartContainer = () => {
   return (
     <EnhancedDeviceUsageChart
-      useGetDataQuery={useGetDeviceAnalyticsQuery}
+      useGetDataQuery={useFetchAnalyticsQuery}
       title="Devices"
       description="This chart shows how many users clicked on the links, organized by
               device."
