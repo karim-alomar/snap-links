@@ -6,7 +6,11 @@ export const useAuth = () => {
 
   const login = (token?: string) => {
     if (token) {
-      Cookies.set("authorization", token);
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + 30);
+      Cookies.set("authorization", token, {
+        expires: expirationDate,
+      });
       Cookies.remove("guest_id");
       navigate("/");
       window.location.reload();
