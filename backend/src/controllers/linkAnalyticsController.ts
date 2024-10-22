@@ -38,11 +38,17 @@ export const fetchAnalytics = async (req: Request, res: Response) => {
       })[],
       nameKey: string
     ) => {
-      return data.map((item) => ({
-        key: item[nameKey] || "Other",
-        visitors: item._count[nameKey],
-        fill: `var(--color-${item[nameKey]?.toLowerCase() || "other"})`,
-      }));
+      return data.map((item) => {
+        const isNameMissing =
+          !item[nameKey] || item[nameKey].toLowerCase() === "unknown";
+        return {
+          key: isNameMissing ? "Other" : item[nameKey],
+          visitors: item._count[nameKey],
+          fill: `var(--color-${
+            isNameMissing ? "other" : item[nameKey]?.toLowerCase()
+          })`,
+        };
+      });
     };
 
     const chartData = {
