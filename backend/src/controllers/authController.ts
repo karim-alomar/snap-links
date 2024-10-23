@@ -23,8 +23,10 @@ export const auth = async (req: Request, res: Response) => {
     return;
   }
 
+  const { password, ...userWithoutPassword } = user;
+
   res.json({
-    data: user,
+    data: userWithoutPassword,
     messages: {
       success: "Success",
     },
