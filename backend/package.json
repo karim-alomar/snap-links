@@ -25,6 +25,7 @@
     "@types/cors": "^2.8.17",
     "@types/express-useragent": "^1.0.5",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/ws": "^8.5.12",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -32,7 +33,9 @@
     "express": "^4.21.1",
     "express-useragent": "^1.0.15",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.20.0"
+    "prisma": "^5.20.0",
+    "uuid": "^10.0.0",
+    "ws": "^8.18.0"
   },
   "_moduleAliases": {
     "@": "./src"
